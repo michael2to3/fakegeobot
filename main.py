@@ -1,6 +1,6 @@
 from telethon import TelegramClient, events, types
 from datetime import datetime
-import schedule
+import asyncio
 import time, os
 
 api_id = os.environ.get('API_ID')
@@ -12,24 +12,32 @@ if api_id is None or api_hash is None or session_name is None or bot_token is No
     print("Api is none")
     exit(1)
 
-# Create a new Telegram client
 client = TelegramClient('session_name', int(api_id), api_hash)
 
-# Start the client
-client.start(bot_token=bot_token)
-
-# Handle the '/start' command
 @client.on(events.NewMessage(pattern='/start'))
 async def start_handler(event):
     await event.respond('Welcome! Please use /auth to authenticate')
 
-# Handle the '/auth' command
 @client.on(events.NewMessage(pattern='/auth'))
 async def auth_handler(event):
-    # Send the Telegram Login Widget
-    await event.respond('Please click on this link to authenticate: t.me/your_bot?start=auth_token')
+    phone_number = event.message.text.split()[1]
+    await client.send_code_request(phone_number)
+    await event.respond("Code sent to your number")
 
-# Handle the callback from the Telegram Login Widget
+    async def code_callback(event):
+        code = event.message.text
+        try:
+            user_client = TelegramClient(phone_number, api_id, api_hash)
+            await user_client.start(phone_number=phone_number, code=code)
+            await event.respond('Authentication successful!')
+            asyncio.create_task(send_location_task(user_client))
+        except Exception as e:
+            await event.respond('Error: ' + str(e))
+        finally:
+            client.remove_event_handler(code_callback, events.NewMessage)
+    client.add_event_handler(code_callback, events.NewMessage)
+
+
 @client.on(events.CallbackQuery(data='auth_token'))
 async def auth_callback_handler(event):
     # Get the phone number and code from the callback
@@ -42,10 +50,9 @@ async def auth_callback_handler(event):
         await event.respond('Error: ' + str(e))
     else:
         await event.respond('Authentication successful!')
-        # Schedule the job to send live location every 30 minutes
-        schedule.every(30).minutes.do(send_location)
+        asyncio.create_task(send_location_task())
 
-async def send_location():
+async def send_live_location(client):
     await client.send_message(
         '@me',
         file=types.InputMediaGeoLive(
@@ -53,13 +60,13 @@ async def send_location():
             period=60
         )
     )
+async def send_location_task():
+    while True:
+        # Send the live location to the specific username
+        await send_live_location(client);
+        await asyncio.sleep(1800) # 1800 seconds = 30 minutes
 
 
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)
-
-# Stop the client
-client.stop()
-
+# Start the client
+client.start(bot_token=bot_token)
+client.run_until_disconnected()
