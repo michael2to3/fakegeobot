@@ -1,4 +1,4 @@
-![Poster](.readme/poster.jpg)
+![Poster](https://github.com/michael2to3/fakegeo-polychessbot/blob/main/.readme/poster.png)
 # Telegram Fake Location Bot
 A Python-based Telegram bot that allows users to send fake location data to other bots.
 
