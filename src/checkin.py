@@ -1,7 +1,8 @@
 from telethon.sync import TelegramClient
+from telethon.types import InputMediaGeoLive
 
-import Geolocation
-import UserAuth
+from geolocation import Geolocation
+from userauth import UserAuth
 
 
 class CheckIn:
@@ -14,13 +15,16 @@ class CheckIn:
     def set_to_username(self, to_username: str) -> None:
         self._to_username = to_username
 
-    def auth_client(self, phone: str, authcode: str):
+    def auth_client(self, phone: str, authcode: str) -> None:
         client = UserAuth(self._union_session_name,
                           self._api_id, self._api_hash)
         client.start(phone, authcode)
 
-    async def send_live_location(self):
+    async def send_live_location(self) -> None:
         geo = Geolocation()
+        # Well... Ignore error from library tg, it's ok
+        # Still send InputMediaGeoLive
+        stream: InputMediaGeoLive = geo.get()
         await self._client.send_message(
             self._to_username,
-            file=geo.get())
+            file=stream)

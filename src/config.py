@@ -2,18 +2,17 @@ from decouple import config
 
 
 class Config:
-    _api_id: str
+    _api_id: int
+    _bot_token: str
     _api_hash: str
     _session_name: str
-    _phone_number: str
     _auth_code: str
 
     def __init__(self):
-        self._api_id = self._get_config('API_ID')
+        self._api_id = int(self._get_config('API_ID'))
         self._api_hash = self._get_config('API_HASH')
         self._session_name = self._get_config('SESSION_NAME')
-        self._phone_number = self._get_config('PHONE_NUMBER')
-        self._auth_code = self._get_config('AUTH_CODE')
+        self._bot_token = self._get_config('BOT_TOKEN')
 
     def _get_config(self, name: str) -> str:
         output = config(name)
@@ -30,8 +29,5 @@ class Config:
     def get_session_name(self):
         return self._session_name
 
-    def get_phone(self):
-        return self._phone_number
-
-    def get_auth_code(self):
-        return self._auth_code
+    def get_bot_token(self):
+        return self._bot_token

@@ -18,7 +18,7 @@ class Geolocation:
     def set_timeout(self, timeout: int) -> None:
         self._timeout = timeout
 
-    def get(self) -> InputMediaGeoLive:
+    def get(self):
         return InputMediaGeoLive(
             InputGeoPoint(self._lat, self._long),
             period=self._timeout
