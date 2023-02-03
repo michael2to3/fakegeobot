@@ -59,6 +59,8 @@ class Bot:
             await client.send_code_request(phone, force_sms=True)
             await update.message.reply_text("Can you send me your auth code")
             self._users[chat_id] = User(
+                api_id=self._api_id,
+                api_hash=self._api_hash,
                 client=client,
                 username=username,
                 chat_id=chat_id,

@@ -3,9 +3,8 @@ from decouple import config
 
 class Config:
     _api_id: int
-    _bot_token: str
     _api_hash: str
-    _auth_code: str
+    _bot_token: str
 
     def __init__(self):
         self.api_id = int(self._get_config('API_ID'))
@@ -13,10 +12,10 @@ class Config:
         self.bot_token = self._get_config('BOT_TOKEN')
 
     def __getattr__(self, name: str):
-        return self.__dict__[f'_{name}']
+        return self.__dict__[name]
 
     def __setattr__(self, name: str, value):
-        self.__dict__[f'_{name}'] = value
+        self.__dict__[name] = value
 
     def _get_config(self, name: str) -> str:
         output = config(name)
