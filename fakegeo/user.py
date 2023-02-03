@@ -32,7 +32,7 @@ class User:
         c = conn.cursor()
         api = self._api
         info = self._info
-        c.execute("""
+        c.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 api_id TEXT,
                 api_hash TEXT,
@@ -44,8 +44,8 @@ class User:
                 schedule TEXT
                 ):
             )
-        """)
-        c.execute("""
+        ''')
+        c.execute('''
             INSERT INTO users (
                 api_id,
                 api_hash,
@@ -57,7 +57,7 @@ class User:
                 schedule
  )
             VALUES (?,?,?,?,?,?,?)
-        """, (
+        ''', (
             api._api_id,
             api._api_hash,
             info._session_name,
@@ -74,7 +74,7 @@ class User:
     def load(cls, chat_id: str, path_db: str):
         conn = sqlite3.connect(path_db)
         c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE chat_id=?", (chat_id))
+        c.execute('SELECT * FROM users WHERE chat_id=?', (chat_id))
         row = c.fetchone()
         conn.close()
 
