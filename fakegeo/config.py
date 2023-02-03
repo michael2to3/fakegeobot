@@ -5,13 +5,11 @@ class Config:
     _api_id: int
     _bot_token: str
     _api_hash: str
-    _session_name: str
     _auth_code: str
 
     def __init__(self):
         self.api_id = int(self._get_config('API_ID'))
         self.api_hash = self._get_config('API_HASH')
-        self.session_name = self._get_config('SESSION_NAME')
         self.bot_token = self._get_config('BOT_TOKEN')
 
     def __getattr__(self, name: str):
