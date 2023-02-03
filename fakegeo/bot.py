@@ -33,15 +33,16 @@ class Bot:
 
         await update.message.reply_text(
             '''
-Hi comrade. \n
+Hi comrade.\n
 How to enable this future? Follow the steps:
 1) Press /auth {YOUR PHONE NUMBER}
 (for ex: /auth +79992132533)
-2) Then you need put code
+2) Then you need put /code {CODE}
 (fox ex: 28204)
 3) if the schedule has changed, u can change the recurrence of sending messages
 /schedule {CRON LANG} (for ex: /schedule 30 18 * * 5)
 It's little hard, site can help you: https://cron.help/
+More info: https://github.com/michael2to3/fakegeo-polychessbot
 '''
         )
 
@@ -98,10 +99,10 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
             await update.message.reply_text(emess)
 
     async def _schedule(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        user = self._users[update.message.chat_id]
+        id = update.message.chat_id
         text = update.message.text
-        user._info._schedule = text
-        user.save()
+        self._users[id]._info._schedule = text
+        self._users[id].save()
 
     async def _raw_code(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         text = update.message.text
@@ -115,6 +116,7 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         chat_id = update.message.chat_id
         try:
             self._users[chat_id].code = code
+            self._users[chat_id].save()
         except KeyError:
             emess = 'User not found, need first step /auth after send code'
             await update.message.reply_text(emess)
