@@ -97,6 +97,12 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         finally:
             await update.message.reply_text(emess)
 
+    async def _schedule(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        user = self._users[update.message.chat_id]
+        text = update.message.text
+        user._info._schedule = text
+        user.save()
+
     async def _raw_code(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         text = update.message.text
         code: int = -1
@@ -119,5 +125,6 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         app.add_handler(CommandHandler('help', self._help))
         app.add_handler(CommandHandler('auth', self._auth))
         app.add_handler(CommandHandler('code', self._raw_code))
+        app.add_handler(CommandHandler('schedule', self._schedule))
 
         app.run_polling()
