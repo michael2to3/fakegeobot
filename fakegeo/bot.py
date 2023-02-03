@@ -21,7 +21,7 @@ class Bot:
     _app: Application
     _users: Dict[int, User] = {}
 
-    def __init__(self, token: str, api_id: int, api_hash: str):
+    def __init__(self, token: str, api_id: int, api_hash: str, path_db: str = 'user.db'):
         self._app = Application.builder().token(token).build()
         self._api_id = api_id
         self._api_hash = api_hash
