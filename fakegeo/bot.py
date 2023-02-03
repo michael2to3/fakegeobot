@@ -78,7 +78,7 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
             return
 
         client = TelegramClient(session_name, self._api_id, self._api_hash)
-        emess = "Nothing to do"
+        emess = 'Nothing to do'
         try:
             await client.connect()
             await client.send_code_request(phone, force_sms=True)
@@ -86,11 +86,11 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
             api = Api(self._api_id, self._api_hash)
             info = UserInfo(session_name, username, chat_id, phone, -1)
             self._users[chat_id] = User(api, info, client)
-            emess = "Can you send me your auth code"
+            emess = 'Can you send me your auth code'
         except RuntimeError:
-            emess = "Oops bad try access your account, I don't know what doing"
+            emess = 'Oops bad try access your account'
         except FloodWaitError as e:
-            emess = f"Oops flood exception! Wait: {e.seconds} seconds"
+            emess = f'Oops flood exception! Wait: {e.seconds} seconds'
         finally:
             await update.message.reply_text(emess)
 
