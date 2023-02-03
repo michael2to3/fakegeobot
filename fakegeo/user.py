@@ -71,13 +71,29 @@ class User:
         conn.close()
 
     @classmethod
-    def load(cls, chat_id: str, path_db: str):
+    def loadAll(cls, path_db: str):
         conn = sqlite3.connect(path_db)
         c = conn.cursor()
-        c.execute('SELECT * FROM users WHERE chat_id=?', (chat_id))
+        c.execute('SELECT * FROM users')
+        rows = c.fetchall()
+        conn.close()
+
+        for row in rows:
+            yield cls._generate(row, path_db)
+
+    @classmethod
+    def load(cls, chat_id: int, path_db: str):
+        id = str(chat_id)
+        conn = sqlite3.connect(path_db)
+        c = conn.cursor()
+        c.execute('SELECT * FROM users WHERE chat_id=?', (id))
         row = c.fetchone()
         conn.close()
 
+        return cls._generate(row, path_db)
+
+    @classmethod
+    def _generate(cls, row, path_db: str):
         (api_id,
          api_hash,
          session_name,
@@ -87,7 +103,9 @@ class User:
          auth_code,
          schedule) = row
         client = TelegramClient(
-            session=session_name, api_id=api_id, api_hash=api_hash)
+            session=session_name,
+            api_id=api_id,
+            api_hash=api_hash)
         user_info = UserInfo(
             session_name,
             username,
