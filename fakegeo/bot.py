@@ -35,8 +35,10 @@ class Bot:
             '''
 Hi comrade. \n
 How to enable this future? Follow the steps:
-1) Press /auth {YOUR PHONE NUMBER} (for ex: /auth +79992132533)
-2) Then you need put code (fox ex: 28204)
+1) Press /auth {YOUR PHONE NUMBER}
+(for ex: /auth +79992132533)
+2) Then you need put code
+(fox ex: 28204)
 3) if the schedule has changed, u can change the recurrence of sending messages
 /schedule {CRON LANG} (for ex: /schedule 30 18 * * 5)
 It's little hard, site can help you: https://cron.help/
@@ -47,11 +49,12 @@ It's little hard, site can help you: https://cron.help/
         message = '''
 /start - Start bot
 /help - Show this message
-/auth PHONE_NUMBER - Replace PHONE_NUMBER(for ex: +79992132533) to your phone
-for auth in tg
-/code CODE - Replace CODE(fox ex: 28204) to your code after make auth
-/schedule CRON - Replace CRON(for ex: 30 18 * * 5) to your schedule
-to make repeat for your schedule
+/auth PHONE_NUMBER - Replace PHONE_NUMBER to your phone for auth in tg
+ex: /auth +79992132533
+/code CODE - Replace CODE to your code after make auth
+ex: /code 28204
+/schedule CRON - Replace CRON to your schedule to make repeat for your schedule
+/schedule 30 18 * * 5
 Service for help cron: https://cron.help/#30_18_*_*_5
 More info: https://github.com/michael2to3/fakegeo-polychessbot
 '''
