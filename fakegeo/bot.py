@@ -156,10 +156,22 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
             await update.message.reply_text(emess)
 
     async def _disable(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        pass
+        chat_id = update.message.chat_id
+        if chat_id in self._users:
+            self._users[chat_id]._active = False
+            self._session.save(self._users[chat_id])
+            await update.message.reply_text('Your account is disable')
+        else:
+            await self._start(update, _)
 
     async def _enable(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        pass
+        chat_id = update.message.chat_id
+        if chat_id in self._users:
+            self._users[chat_id]._active = True
+            self._session.save(self._users[chat_id])
+            await update.message.reply_text('Your account is enable!')
+        else:
+            await self._start(update, _)
 
     def run(self) -> None:
         app = self._app

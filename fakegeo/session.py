@@ -38,7 +38,8 @@ class Session:
                 chat_id INTEGER,
                 phone TEXT,
                 auth_code INTEGER,
-                schedule TEXT
+                schedule TEXT,
+                active BOOLEAN
                 )
         ''')
         return self
@@ -50,6 +51,7 @@ class Session:
     def _insert(self, user: User):
         api = user._api
         info = user._info
+        active = user._active
         self._cursor.execute('''
             INSERT INTO users (
                 api_id,
@@ -59,9 +61,10 @@ class Session:
                 chat_id,
                 phone,
                 auth_code,
-                schedule
+                schedule,
+                active
  )
-            VALUES (?,?,?,?,?,?,?)
+            VALUES (?,?,?,?,?,?,?,?)
         ''', (
             api._api_id,
             api._api_hash,
@@ -70,12 +73,14 @@ class Session:
             info._chat_id,
             info._phone,
             info._auth_code,
-            info._schedule
+            info._schedule,
+            active
         ))
 
     def _update(self, user: User):
         api = user._api
         info = user._info
+        active = user._active
         self._cursor.execute('''
             UPDATE users SET
                 api_id=?,
@@ -85,7 +90,8 @@ class Session:
                 chat_id=?,
                 phone=?,
                 auth_code=?,
-                schedule=?
+                schedule=?,
+                active=?
             WHERE chat_id=?
         ''', (
             api._api_id,
@@ -95,7 +101,8 @@ class Session:
             info._phone,
             info._auth_code,
             info._schedule,
-            info._chat_id
+            info._chat_id,
+            active
         ))
 
     def save(self, user: User):
@@ -130,7 +137,8 @@ class Session:
          chat_id,
          phone,
          auth_code,
-         schedule) = row
+         schedule,
+         active) = row
         client = TelegramClient(
             session=session_name,
             api_id=api_id,
@@ -144,4 +152,4 @@ class Session:
             schedule
         )
         api = Api(api_id, api_hash)
-        return User(api, user_info, client, self._path_db)
+        return User(api, user_info, client, active, self._path_db)
