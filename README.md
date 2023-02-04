@@ -7,13 +7,16 @@ This bot was created to help users bypass location checks in various application
 
 ## Requirements
 - Python 3.x
-- [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) library
+- [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)
+- [aiocron](https://github.com/gawel/aiocron)
+- [python-decouple](https://github.com/HBNetwork/python-decouple)
+- [Telethon](https://github.com/LonamiWebs/Telethon)
 
 ## Usage
 1. Clone this repository
 2. Run `pip install -r requirements.txt` to install required packages
 3. Create a bot in Telegram and get your API key
-4. Set your API key as an environment variable with the name `BOT_TOKEN`
+4. Set your API key as an environment variable with the name `BOT_TOKEN`, `API_ID`, `API_HASH` and `SQLITE_PATH`
 5. Run the bot using `python ./fakegeo/main.py`
 
 ## Contribution
@@ -21,4 +24,3 @@ Feel free to contribute to the project by submitting pull requests or opening is
 
 ## License
 This project is licensed under the GNU License. See the [LICENSE](LICENSE) file for details.
-
