@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict
 
 from aiocron import Cron
 from telegram import Update
@@ -105,7 +105,8 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         chat_id = update.message.chat_id
 
         if chat_id in self._users:
-            await update.message.reply_text("U exist")
+            emess = "U already auth"
+            await update.message.reply_text(emess)
             return
 
         username = update.message.from_user.full_name
@@ -114,7 +115,7 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         text = update.message.text
         phone: str
         try:
-            phone = Arg().get_phone(text)
+            phone = Arg.get_phone(text)
         except ValueError:
             await self._help(update, _)
             return
@@ -149,10 +150,7 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         user = self._users[chat_id]
 
         self._crons[chat_id].stop()
-
-        user._active = False
-        self._session.save(user)
-
+        self._session.delete(user._info._chat_id)
         self._users[chat_id] = user
 
     async def _schedule(self, update: Update, _: ContextTypes.DEFAULT_TYPE):

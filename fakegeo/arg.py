@@ -1,5 +1,6 @@
 class Arg:
-    def get_phone(self, text: str) -> str:
+    @staticmethod
+    def get_phone(text: str) -> str:
         parts = text.split()
         if parts is None or len(parts) != 2:
             raise ValueError('Not valid parse string')
@@ -10,7 +11,8 @@ class Arg:
 
         return phone
 
-    def get_auth_code(self, text: str) -> int:
+    @staticmethod
+    def get_auth_code(text: str) -> int:
         parts = text.split()
         if parts is None or len(parts) > 1:
             raise ValueError('Not valid message')
