@@ -13,12 +13,12 @@ This bot was created to help users bypass location checks in various application
 1. Clone this repository
 2. Run `pip install -r requirements.txt` to install required packages
 3. Create a bot in Telegram and get your API key
-4. Set your API key as an environment variable with the name `TELEGRAM_API_KEY`
-5. Run the bot using `python bot.py`
+4. Set your API key as an environment variable with the name `BOT_TOKEN`
+5. Run the bot using `python ./fakegeo/main.py`
 
 ## Contribution
 Feel free to contribute to the project by submitting pull requests or opening issues for bug reports and feature requests.
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU License. See the [LICENSE](LICENSE) file for details.
 
