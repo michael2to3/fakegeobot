@@ -17,8 +17,7 @@ class CheckIn:
             self._to_username,
             file=stream)
 
-    async def run(self, user: User):
+    def run(self, user: User):
         cron: str = user._info._schedule
         def func(): return self.send_live_location(user._client)
-        await func()
         crontab(cron, func=func, start=True)

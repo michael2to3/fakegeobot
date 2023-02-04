@@ -40,7 +40,8 @@ class Bot:
         self._users = dict([(i.chat_id, i) for i in users])
 
         self._checkin = CheckIn()
-        asyncio.run(self._start_schedule(users))
+        for user in self._users.values():
+            self._checkin.run(user)
 
     async def _start_schedule(self, users: List[User]):
         for user in self._users.values():
@@ -150,7 +151,7 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         chat_id = update.message.chat_id
         try:
             self._users[chat_id].code = code
-            self._users[chat_id].save()
+            self._session.save(self._users[chat_id])
         except KeyError:
             emess = 'User not found, need first step /auth after send code'
             await update.message.reply_text(emess)

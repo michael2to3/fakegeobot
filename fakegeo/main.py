@@ -5,13 +5,22 @@ from threading import Thread
 
 
 def start_cron():
-    thread = Thread(target=asyncio.get_event_loop().run_forever)
-    thread.start()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
 
 
-if __name__ == '__main__':
-    start_cron()
+def start_bot():
     config = Config()
     bot = Bot(config.bot_token,
               config.api_id, config.api_hash)
     bot.run()
+
+
+if __name__ == '__main__':
+    tcron = Thread(target=start_cron)
+
+    tcron.start()
+    start_bot()
+
+    tcron.join()
