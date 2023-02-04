@@ -1,4 +1,5 @@
-from typing import Dict
+import asyncio
+from typing import Dict, List
 
 from telegram import Update
 from telegram.ext import (
@@ -35,10 +36,16 @@ class Bot:
         self._api_hash = api_hash
 
         self._session = Session(path_db).connection().cursor().createTable()
-        users = self._session.loadAll()
-        self._users = dict([(i.chat_id, i) for i in list(users)])
+        users = list(self._session.loadAll())
+        self._users = dict([(i.chat_id, i) for i in users])
 
         self._checkin = CheckIn()
+        asyncio.run(self._start_schedule(users))
+
+    async def _start_schedule(self, users: List[User]):
+        for user in self._users.values():
+            print(user)
+            await self._checkin.run(user)
 
     def __del__(self):
         for user in self._users.values():
@@ -125,8 +132,11 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
     async def _schedule(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         id = update.message.chat_id
         text = update.message.text
-        self._users[id]._info._schedule = text
-        self._users[id].save()
+        if id in self._users:
+            self._users[id]._info._schedule = text
+            self._users[id].save()
+        else:
+            await update.message.reply_text('Need complete first step /auth')
 
     async def _raw_code(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         text = update.message.text
@@ -145,6 +155,12 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
             emess = 'User not found, need first step /auth after send code'
             await update.message.reply_text(emess)
 
+    async def _disable(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        pass
+
+    async def _enable(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        pass
+
     def run(self) -> None:
         app = self._app
         app.add_handler(CommandHandler('start', self._start))
@@ -153,6 +169,8 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         app.add_handler(CommandHandler('code', self._raw_code))
         app.add_handler(CommandHandler('schedule', self._schedule))
         app.add_handler(CommandHandler('send', self._send_now))
+        app.add_handler(CommandHandler('disable', self._disable))
+        app.add_handler(CommandHandler('enable', self._enable))
         app.add_handler(CommandHandler('delete', self._delete))
 
         app.run_polling()
