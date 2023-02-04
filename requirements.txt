@@ -1,0 +1,4 @@
+aiocron==1.8
+python-decouple==3.7
+python_telegram==0.16.0
+Telethon==1.26.1
