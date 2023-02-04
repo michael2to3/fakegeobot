@@ -10,25 +10,36 @@ from telethon import TelegramClient
 from telethon.errors import FloodWaitError
 
 from arg import Arg
+from checkin import CheckIn
 from session_name import SessionName
 from type import Api, UserInfo
 from user import User
-from checkin import CheckIn
+from session import Session
 
 
 class Bot:
     _api_id: int
     _api_hash: str
     _app: Application
-    _users: Dict[int, User] = {}
+    _session: Session
+    _users: Dict[int, User]
 
-    def __init__(self, token: str, api_id: int, api_hash: str, path_db: str = 'user.db'):
+    def __init__(self,
+                 token: str,
+                 api_id: int,
+                 api_hash: str,
+                 path_db: str = 'user.db'):
         self._app = Application.builder().token(token).build()
         self._api_id = api_id
         self._api_hash = api_hash
 
-        users = list(User.loadAll(path_db))
-        self._users = dict([(i.chat_id, i) for i in users])
+        self._session = Session(path_db).connection().createTable()
+        users = self._session.loadAll()
+        self._users = dict([(i.chat_id, i) for i in list(users)])
+
+    def __del__(self):
+        for user in self._users.values():
+            self._session.save(user)
 
     async def _start(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
