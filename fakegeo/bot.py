@@ -11,10 +11,10 @@ from telethon.errors import FloodWaitError
 
 from arg import Arg
 from checkin import CheckIn
+from session import Session
 from session_name import SessionName
 from type import Api, UserInfo
 from user import User
-from session import Session
 
 
 class Bot:
@@ -23,6 +23,7 @@ class Bot:
     _app: Application
     _session: Session
     _users: Dict[int, User]
+    _checkin: CheckIn
 
     def __init__(self,
                  token: str,
@@ -33,9 +34,11 @@ class Bot:
         self._api_id = api_id
         self._api_hash = api_hash
 
-        self._session = Session(path_db).connection().createTable()
+        self._session = Session(path_db).connection().cursor().createTable()
         users = self._session.loadAll()
         self._users = dict([(i.chat_id, i) for i in list(users)])
+
+        self._checkin = CheckIn()
 
     def __del__(self):
         for user in self._users.values():
@@ -113,7 +116,7 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
     async def _send_now(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
         client = self._users[chat_id]._client
-        await CheckIn().send_live_location(client)
+        await self._checkin.send_live_location(client)
         await update.message.reply_text('Well done')
 
     async def _delete(self, update: Update, _: ContextTypes.DEFAULT_TYPE):

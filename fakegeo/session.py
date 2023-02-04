@@ -39,8 +39,7 @@ class Session:
                 phone TEXT,
                 auth_code INTEGER,
                 schedule TEXT
-                ):
-            )
+                )
         ''')
         return self
 
@@ -48,7 +47,7 @@ class Session:
         self._connect.commit()
         return self
 
-    def save(self, user: User):
+    def _insert(self, user: User):
         api = user._api
         info = user._info
         self._cursor.execute('''
@@ -73,6 +72,41 @@ class Session:
             info._auth_code,
             info._schedule
         ))
+
+    def _update(self, user: User):
+        api = user._api
+        info = user._info
+        self._cursor.execute('''
+            UPDATE users SET
+                api_id=?,
+                api_hash=?,
+                session_name=?,
+                username=?,
+                chat_id=?,
+                phone=?,
+                auth_code=?,
+                schedule=?
+            WHERE chat_id=?
+        ''', (
+            api._api_id,
+            api._api_hash,
+            info._session_name,
+            info._username,
+            info._phone,
+            info._auth_code,
+            info._schedule,
+            info._chat_id
+        ))
+
+    def save(self, user: User):
+        chat_id = user._info._chat_id
+        current = self.load(chat_id)
+
+        if current is None:
+            self._insert(user)
+        else:
+            self._update(user)
+
         return self
 
     def loadAll(self) -> Iterable[User]:
@@ -111,4 +145,3 @@ class Session:
         )
         api = Api(api_id, api_hash)
         return User(api, user_info, client, self._path_db)
-
