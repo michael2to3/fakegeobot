@@ -13,6 +13,7 @@ from arg import Arg
 from session_name import SessionName
 from type import Api, UserInfo
 from user import User
+from checkin import CheckIn
 
 
 class Bot:
@@ -25,6 +26,9 @@ class Bot:
         self._app = Application.builder().token(token).build()
         self._api_id = api_id
         self._api_hash = api_hash
+
+        users = list(User.loadAll(path_db))
+        self._users = dict([(i.chat_id, i) for i in users])
 
     async def _start(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
@@ -51,11 +55,15 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
 /start - Start bot
 /help - Show this message
 /auth PHONE_NUMBER - Replace PHONE_NUMBER to your phone for auth in tg
-ex: /auth +79992132533
+    ex: /auth +79992132533
 /code CODE - Replace CODE to your code after make auth
-ex: /code 28204
+    ex: /code 28204
 /schedule CRON - Replace CRON to your schedule to make repeat for your schedule
-/schedule 30 18 * * 5
+    ex: /schedule 30 18 * * 5
+/send - Send now your fake geolocation
+    ex: /send
+/delete - Delete your token and all data about you
+    ex: /delete
 Service for help cron: https://cron.help/#30_18_*_*_5
 More info: https://github.com/michael2to3/fakegeo-polychessbot
 '''
@@ -98,6 +106,15 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         finally:
             await update.message.reply_text(emess)
 
+    async def _send_now(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        chat_id = update.message.chat_id
+        client = self._users[chat_id]._client
+        await CheckIn().send_live_location(client)
+        await update.message.reply_text('Well done')
+
+    async def _delete(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        pass
+
     async def _schedule(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         id = update.message.chat_id
         text = update.message.text
@@ -128,5 +145,7 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         app.add_handler(CommandHandler('auth', self._auth))
         app.add_handler(CommandHandler('code', self._raw_code))
         app.add_handler(CommandHandler('schedule', self._schedule))
+        app.add_handler(CommandHandler('send', self._send_now))
+        app.add_handler(CommandHandler('delete', self._delete))
 
         app.run_polling()
