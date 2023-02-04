@@ -1,3 +1,4 @@
+import logging
 import sqlite3
 from sqlite3 import Connection, Cursor
 from typing import Iterable
@@ -9,11 +10,13 @@ from user import User
 
 
 class Session:
+    logger: logging.Logger
     _path_db: str
     _connect: Connection
     _cursor: Cursor
 
     def __init__(self, path_db: str):
+        self.logger = logging.getLogger(__name__)
         self._path_db = path_db
 
     def connection(self):
@@ -29,6 +32,7 @@ class Session:
         return self
 
     def createTable(self):
+        self.logger.debug('Create table')
         self._cursor.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 api_id TEXT,
@@ -49,6 +53,7 @@ class Session:
         return self
 
     def _insert(self, user: User):
+        self.logger.debug('Create user', str(user))
         api = user._api
         info = user._info
         active = user._active
@@ -78,6 +83,7 @@ class Session:
         ))
 
     def _update(self, user: User):
+        self.logger.debug('Update user data', str(user))
         api = user._api
         info = user._info
         active = user._active
@@ -117,12 +123,14 @@ class Session:
         return self
 
     def loadAll(self) -> Iterable[User]:
+        self.logger.debug('Load add users')
         self._cursor.execute('SELECT * FROM users')
         rows = self._cursor.fetchall()
         for row in rows:
             yield self._generate(row)
 
     def load(self, chat_id: int) -> User:
+        self.logger.debug('Load user with chat_id ', str(chat_id))
         id = str(chat_id)
         self._cursor.execute('SELECT * FROM users WHERE chat_id=?', (id))
         row = self._cursor.fetchone()

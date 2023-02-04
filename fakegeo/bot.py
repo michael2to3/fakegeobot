@@ -1,6 +1,6 @@
-import asyncio
 from typing import Dict, List
 
+from aiocron import Cron
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -16,21 +16,26 @@ from session import Session
 from session_name import SessionName
 from type import Api, UserInfo
 from user import User
+import logging
 
 
 class Bot:
+    logger: logging.Logger
     _api_id: int
     _api_hash: str
     _app: Application
     _session: Session
     _users: Dict[int, User]
     _checkin: CheckIn
+    _crons: Dict[int, Cron]
 
     def __init__(self,
                  token: str,
                  api_id: int,
                  api_hash: str,
                  path_db: str = 'user.db'):
+        self.logger = logging.getLogger(__name__)
+
         self._app = Application.builder().token(token).build()
         self._api_id = api_id
         self._api_hash = api_hash
@@ -40,19 +45,22 @@ class Bot:
         self._users = dict([(i.chat_id, i) for i in users])
 
         self._checkin = CheckIn()
-        for user in self._users.values():
-            self._checkin.run(user)
+        self._start_schedule()
+        self._crons = {}
 
-    async def _start_schedule(self, users: List[User]):
+    def _start_schedule(self):
         for user in self._users.values():
-            print(user)
-            await self._checkin.run(user)
+            if user._active:
+                chat_id = user._info._chat_id
+                self._crons[chat_id] = self._checkin.run(user)
 
     def __del__(self):
+        self.logger.debug('Del call - Save all user')
         for user in self._users.values():
             self._session.save(user)
 
     async def _start(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        self.logger.debug('Start for user', str(update))
         user = update.effective_user
         if user is None:
             raise RuntimeError('User is none')
@@ -73,6 +81,7 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         )
 
     async def _help(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        self.logger.debug('Help for user', str(update))
         message = '''
 /start - Start bot
 /help - Show this message
@@ -92,7 +101,13 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         await update.message.reply_text(message)
 
     async def _auth(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        self.logger.debug('Auth for user', str(update))
         chat_id = update.message.chat_id
+
+        if chat_id in self._users:
+            await update.message.reply_text("U exist")
+            return
+
         username = update.message.from_user.full_name
         session_name = SessionName().get_session_name()
 
@@ -122,21 +137,33 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
             await update.message.reply_text(emess)
 
     async def _send_now(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        self.logger.debug('Send now for user', str(update))
         chat_id = update.message.chat_id
         client = self._users[chat_id]._client
         await self._checkin.send_live_location(client)
         await update.message.reply_text('Well done')
 
     async def _delete(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        pass
+        self.logger.debug('Delete for user', str(update))
+        chat_id = update.message.chat_id
+        user = self._users[chat_id]
+
+        self._crons[chat_id].stop()
+
+        user._active = False
+        self._session.save(user)
+
+        self._users[chat_id] = user
 
     async def _schedule(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        self.logger.debug('Schedule for user', str(update))
         id = update.message.chat_id
         text = update.message.text
         if id in self._users:
             self._users[id]._info._schedule = text
             self._users[id].save()
         else:
+            self.logger.debug('User not auth', str(update))
             await update.message.reply_text('Need complete first step /auth')
 
     async def _raw_code(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
@@ -160,6 +187,7 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         chat_id = update.message.chat_id
         if chat_id in self._users:
             self._users[chat_id]._active = False
+            self._crons[chat_id].stop()
             self._session.save(self._users[chat_id])
             await update.message.reply_text('Your account is disable')
         else:
@@ -169,6 +197,7 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         chat_id = update.message.chat_id
         if chat_id in self._users:
             self._users[chat_id]._active = True
+            self._crons[chat_id].start()
             self._session.save(self._users[chat_id])
             await update.message.reply_text('Your account is enable!')
         else:
