@@ -122,6 +122,11 @@ class Session:
 
         return self
 
+    def delete(self, chat_id: int):
+        self.logger.debug('Remove user ', str(chat_id))
+        id = str(chat_id)
+        self._cursor.execute('DELETE FROM users WHERE chat_id=?', (id))
+
     def loadAll(self) -> Iterable[User]:
         self.logger.debug('Load add users')
         self._cursor.execute('SELECT * FROM users')
