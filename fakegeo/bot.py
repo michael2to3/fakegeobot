@@ -80,13 +80,6 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
 '''
         await update.message.reply_text(message)
 
-    async def echo(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        await update.message.reply_text(update.message.text)
-
-    async def req_user(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        mess = await update.message.reply_text('well hi')
-        print(mess)
-
     async def _auth(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
         username = update.message.from_user.full_name
