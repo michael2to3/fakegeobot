@@ -1,6 +1,7 @@
 from typing import Dict
 
 from aiocron import Cron
+from telethon.errors import SessionPasswordNeededError
 
 from arg import Arg
 from checkin import CheckIn
@@ -58,6 +59,14 @@ class HandlerUsers:
     async def checkin(self, chat_id: int):
         if self.check_exist(chat_id):
             client = self._users[chat_id]._user.instance_telegramclient()
+            phone = self._users[chat_id]._user._info._phone
+            code = self._users[chat_id]._user._info._auth_code
+            self.logger.debug('Checkin', phone, code)
+            try:
+                client.start()
+            except SessionPasswordNeededError:
+                client.start(phone=lambda: phone,
+                             password=lambda: str(code), code_callback=lambda: code)
             await self._checkin.send_live_location(client)
 
     def change_user(self, user: User):
