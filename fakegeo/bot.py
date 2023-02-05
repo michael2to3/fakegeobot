@@ -28,25 +28,28 @@ class Bot:
     _users: Dict[int, User]
     _checkin: CheckIn
     _crons: Dict[int, Cron]
+    _parse: Arg
 
     def __init__(self,
                  token: str,
                  api_id: int,
                  api_hash: str,
-                 path_db: str = 'user.db'):
+                 path_db: str,
+                 name_db: str):
         self.logger = logging.getLogger(__name__)
 
         self._app = Application.builder().token(token).build()
         self._api_id = api_id
         self._api_hash = api_hash
 
-        self._session = Session(path_db).connection().cursor().createTable()
+        self._session = Session(path_db, name_db)
         users = list(self._session.loadAll())
         self._users = dict([(i.chat_id, i) for i in users])
 
         self._checkin = CheckIn()
         self._start_schedule()
         self._crons = {}
+        self._parse = Arg()
 
     def _start_schedule(self):
         for user in self._users.values():
@@ -115,20 +118,22 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         text = update.message.text
         phone: str
         try:
-            phone = Arg.get_phone(text)
+            phone = self._parse.get_phone(text)
         except ValueError:
             await self._help(update, _)
             return
 
         client = TelegramClient(session_name, self._api_id, self._api_hash)
-        emess = 'Nothing to do'
+        emess = 'You send code to auth. Can you put me /code {AUTHCODE}'
         try:
             await client.connect()
             await client.send_code_request(phone, force_sms=True)
 
             api = Api(self._api_id, self._api_hash)
             info = UserInfo(session_name, username, chat_id, phone, -1)
-            self._users[chat_id] = User(api, info, client)
+            user = User(api, info, client)
+            self._users[chat_id] = user
+            self._session.save(user)
             emess = 'Can you send me your auth code'
         except RuntimeError:
             emess = 'Oops bad try access your account'
@@ -149,7 +154,11 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         chat_id = update.message.chat_id
         user = self._users[chat_id]
 
+        # TODO in one case
+        user._active = False
         self._crons[chat_id].stop()
+        user.log_out()
+
         self._session.delete(user._info._chat_id)
         self._users[chat_id] = user
 
@@ -168,7 +177,7 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
         text = update.message.text
         code: int = -1
         try:
-            code = Arg().get_auth_code(text)
+            code = self._parse.get_auth_code(text)
         except ValueError as e:
             await update.message.reply_text(str(e))
             return
