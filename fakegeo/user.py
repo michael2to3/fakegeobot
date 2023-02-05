@@ -8,19 +8,19 @@ class User:
     _info: UserInfo
     _client: TelegramClient
     _active: bool
-    _path_db: str
 
     def __init__(self,
                  api: Api,
                  info: UserInfo,
                  client: TelegramClient,
-                 active: bool = True,
-                 path_db: str = 'user.db'):
+                 active: bool = True):
         self._api = api
         self._info = info
         self._client = client
         self._active = active
-        self._path_db = path_db
+
+    def __del__(self):
+        self._client.disconnect()
 
     def __getattr__(self, name: str):
         return self.__dict__[name]
