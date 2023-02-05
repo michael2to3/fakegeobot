@@ -2,6 +2,15 @@ from bot import Bot
 from config import Config
 import asyncio
 from threading import Thread
+import sys
+import logging
+
+
+def setup_logging():
+    if '--debug' in sys.argv:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.WARN)
 
 
 def start_cron():
@@ -11,13 +20,14 @@ def start_cron():
 
 
 def start_bot():
-    config = Config()
-    bot = Bot(config.bot_token,
-              config.api_id, config.api_hash)
+    cnf = Config()
+    bot = Bot(cnf._bot_token, cnf._api_id,
+              cnf._api_hash, cnf._db_path, 'user.db')
     bot.run()
 
 
 if __name__ == '__main__':
+    setup_logging()
     tcron = Thread(target=start_cron)
 
     tcron.start()
