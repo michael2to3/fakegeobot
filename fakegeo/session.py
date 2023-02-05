@@ -3,8 +3,6 @@ import sqlite3
 from sqlite3 import Connection
 from typing import Iterable
 
-from telethon import TelegramClient
-
 from type import Api, UserInfo
 from user import User
 
@@ -64,8 +62,8 @@ class Session:
  )
             VALUES (?,?,?,?,?,?,?,?,?)
         ''', (
-            api._api_id,
-            api._api_hash,
+            api._id,
+            api._hash,
             info._session_name,
             info._username,
             str(info._chat_id),
@@ -96,8 +94,8 @@ class Session:
                 active=?
             WHERE chat_id=?
         ''', (
-            api._api_id,
-            api._api_hash,
+            api._id,
+            api._hash,
             info._session_name,
             info._username,
             info._phone,
@@ -128,7 +126,7 @@ class Session:
         con.commit()
         con.close()
 
-    def loadAll(self) -> Iterable[User]:
+    def load_all(self) -> Iterable[User]:
         self.logger.debug('Load add users')
         con = self.connect()
         cursor = con.cursor()
@@ -150,11 +148,15 @@ class Session:
         return self._generate(row)
 
     def check_exists(self, chat_id: int) -> bool:
-        try:
-            self.load(chat_id)
-        except TypeError:
-            return False
-        return True
+        self.logger.debug('Load user with chat_id ', str(chat_id))
+        id = str(chat_id)
+        con = self.connect()
+        cursor = con.cursor()
+        cursor.execute('SELECT * FROM users WHERE chat_id=?', (id,))
+        row = cursor.fetchone()
+        con.close()
+
+        return row is not None
 
     def _generate(self, row) -> User:
         if row is None:
@@ -170,11 +172,6 @@ class Session:
          schedule,
          active) = row
 
-        client = TelegramClient(
-            session=session_name,
-            api_id=api_id,
-            api_hash=api_hash)
-
         user_info = UserInfo(
             session_name,
             username,
@@ -184,4 +181,4 @@ class Session:
             schedule
         )
         api = Api(api_id, api_hash)
-        return User(api, user_info, client, active)
+        return User(api, user_info, active)
