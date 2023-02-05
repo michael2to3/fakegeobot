@@ -28,5 +28,13 @@ class CheckIn:
     def run(self, user: User):
         self.logger.debug('Run schedule for ', str(user))
         cron: str = user._info._schedule
-        def func(): return self.send_live_location(user._client)
+        tg = user.instance_telegramclient()
+        def func(): return self.send_live_location(tg)
         return crontab(cron, func=func, start=True)
+
+    def pass_cron(self):
+        schedule = '30 18 * * 6'
+
+        def func():
+            pass
+        return crontab(schedule, func=func, start=False)
