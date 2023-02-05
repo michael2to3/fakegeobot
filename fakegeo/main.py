@@ -4,10 +4,11 @@ import asyncio
 from threading import Thread
 import sys
 import logging
+from decouple import config
 
 
 def setup_logging():
-    if '--debug' in sys.argv:
+    if '--debug' in sys.argv or config('DEBUG') == 'true':
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.WARN)
