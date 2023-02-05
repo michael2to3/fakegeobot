@@ -6,21 +6,21 @@ from type import UserInfo
 class User:
     _api: Api
     _info: UserInfo
-    _client: TelegramClient
+    _client:  TelegramClient | None
     _active: bool
 
-    def __init__(self,
-                 api: Api,
-                 info: UserInfo,
-                 client: TelegramClient,
-                 active: bool = True):
+    def __init__(self, api: Api, info: UserInfo, active: bool):
         self._api = api
         self._info = info
-        self._client = client
         self._active = active
+        self._client = None
 
-    def __del__(self):
-        self._client.disconnect()
+    def instance_telegramclient(self) -> TelegramClient:
+        session_name = self._info._session_name
+        api = self._api
+        if self._client is None:
+            self._client = TelegramClient(session_name, api._id, api._hash)
+        return self._client
 
     def __getattr__(self, name: str):
         return self.__dict__[name]
