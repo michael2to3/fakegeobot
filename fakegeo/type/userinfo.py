@@ -13,13 +13,13 @@ class UserInfo:
             chat_id: int,
             phone: str,
             auth_code: int,
-            schedule: str = '30 18 * * 5'):
+            schedule: str):
         self._session_name = session_name
         self._username = username
         self._chat_id = chat_id
         self._phone = phone
         self._auth_code = auth_code
-        self._schedule = schedule  # Default value: At 6:30pm on Friday
+        self._schedule = schedule
 
     def __getattr__(self, name: str):
         return self.__dict__[name]
