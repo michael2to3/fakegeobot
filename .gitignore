@@ -130,4 +130,4 @@ dmypy.json
 
 *.session
 *.session-journal
-user.db
+*.db
