@@ -1,6 +1,6 @@
 from random import randint
-from telethon import TelegramClient
 from rootpath import fakegeo
+import time
 import unittest
 import os
 Session = fakegeo.Session
@@ -27,11 +27,11 @@ class SessionTest(unittest.TestCase):
             username=username,
             chat_id=chat_id,
             phone='+79992132531',
-            auth_code=76481
+            auth_code=76481,
+            schedule='* * * * *'
         )
         api = Api(api_id=12345678, api_hash='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-        client = TelegramClient(session_name, api._api_id, api._api_hash)
-        return User(api, info, client)
+        return User(api, info, True)
 
     def test_save_load_user(self):
         username = 'first'
@@ -39,7 +39,7 @@ class SessionTest(unittest.TestCase):
         user = self.make_user(username, chat_id)
         session = self.create_session()
         session.save(user)
-        del user
+
         load = session.load(chat_id)
         self.assertIsNotNone(load, 'User not found')
         self.assertEqual(load._info._username, username)
@@ -50,7 +50,6 @@ class SessionTest(unittest.TestCase):
         chat_id = 1928159074
         user = self.make_user(username, chat_id)
         session = self.create_session()
-        user._client.disconnect()
         session.save(user)
 
         user._info._username = new_username
@@ -78,5 +77,5 @@ class SessionTest(unittest.TestCase):
         for us in other_users:
             session.save(us)
 
-        loads = list(session.loadAll())
+        loads = list(session.load_all())
         self.assertGreater(len(loads), 10)
