@@ -134,7 +134,12 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
             user = User(api, info, client)
             self._users[chat_id] = user
             self._session.save(user)
-            emess = 'Can you send me your auth code'
+            emess = '''
+Send me auth code each char separated by a dot
+For example: Login code: 61516
+You put: /code 6.1.5.1.6
+It's need to bypass protect telegram
+'''
         except RuntimeError:
             emess = 'Oops bad try access your account'
         except FloodWaitError as e:

@@ -40,6 +40,7 @@ class Arg:
         index_first_digit = [i.isdigit() for i in code].index(True)
 
         code = code[index_first_digit:].rstrip()
+        code = self.bypass_protect_tg(code)
 
         has_not_allow_symbol = any(not i.isdigit() for i in code)
         if has_not_allow_symbol:
@@ -50,3 +51,6 @@ class Arg:
             raise ValueError('Not correct code')
 
         return int(code)
+
+    def bypass_protect_tg(self, text: str) -> str:
+        return text.replace('.', '')
