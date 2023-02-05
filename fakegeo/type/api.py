@@ -1,10 +1,10 @@
 class Api:
-    _api_id: int
-    _api_hash: str
+    _id: int
+    _hash: str
 
     def __init__(self, api_id: int, api_hash):
-        self._api_id = api_id
-        self._api_hash = api_hash
+        self._id = api_id
+        self._hash = api_hash
 
     def __getattr__(self, name: str):
         return self.__dict__[name]
