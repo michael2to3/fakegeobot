@@ -128,8 +128,12 @@ It's need to bypass protect telegram
         chat_id = update.message.chat_id
         emess = 'Success! Code complete!'
 
+        user = self._users
         try:
-            self._users.change_auth_code(chat_id, text)
+            user.change_auth_code(chat_id, text)
+            user.start_tg_client(chat_id)
+            default_sch = '30 18 * * 5'
+            user.change_schedule(chat_id, default_sch)
         except ValueError:
             emess = 'Bad value of command'
         except KeyError:
