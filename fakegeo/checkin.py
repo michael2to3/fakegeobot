@@ -1,7 +1,7 @@
 import logging
 
 from aiocron import crontab
-from telethon.sync import TelegramClient
+from telethon import TelegramClient
 from telethon.types import InputMediaGeoLive
 
 from geolocation import Geolocation
