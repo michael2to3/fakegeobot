@@ -19,6 +19,12 @@ This bot was created to help users bypass location checks in various application
 4. Set your API key as an environment variable with the name `BOT_TOKEN`, `API_ID`, `API_HASH` and `SQLITE_PATH`
 5. Run the bot using `python ./fakegeo/main.py`
 
+## Start unit test
+
+```sh
+python -m unittest discover -s ./test/
+```
+
 ## Contribution
 Feel free to contribute to the project by submitting pull requests or opening issues for bug reports and feature requests.
 
