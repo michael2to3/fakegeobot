@@ -100,6 +100,7 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
     ex: /delete
 Service for help cron: https://cron.help/#30_18_*_*_5
 More info: https://github.com/michael2to3/fakegeo-polychessbot
+Support: https://t.me/+EGnT6v3APokxMGYy
 '''
         await update.message.reply_text(message)
 
