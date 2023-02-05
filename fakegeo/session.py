@@ -119,10 +119,10 @@ class Session:
 
     def delete(self, chat_id: int):
         self.logger.debug('Remove user ', str(chat_id))
-        id = str(chat_id)
+        sid = str(chat_id)
         sql = 'DELETE FROM users WHERE chat_id=?'
         con = self.connect()
-        con.cursor().execute(sql, (id))
+        con.cursor().execute(sql, (sid,))
         con.commit()
         con.close()
 
