@@ -1,9 +1,11 @@
+import logging
+
+from aiocron import crontab
 from telethon.sync import TelegramClient
 from telethon.types import InputMediaGeoLive
-from user import User
-from aiocron import crontab
+
 from geolocation import Geolocation
-import logging
+from user import User
 
 
 class CheckIn:
