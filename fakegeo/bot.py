@@ -27,10 +27,6 @@ class Bot:
 
     async def _start(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         self.logger.debug('Start for user', str(update))
-        user = update.effective_user
-        if user is None:
-            raise RuntimeError('User is none')
-
         await update.message.reply_text(
             '''
 Hi comrade.\n
