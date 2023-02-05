@@ -7,4 +7,4 @@ services:
     env_file:
       - .env
     volumes:
-      - ./db:/app/db
+      - ./db:/db
