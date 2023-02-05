@@ -22,4 +22,5 @@ class SessionName:
         union_name = ''
         for _ in range(self._length):
             union_name += self._get_random_char()
-        return union_name
+        postfix = '.session'
+        return union_name + postfix
