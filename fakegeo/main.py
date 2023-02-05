@@ -1,5 +1,6 @@
 from bot import Bot
 from config import Config
+from type import Api
 import asyncio
 from threading import Thread
 import sys
@@ -22,8 +23,8 @@ def start_cron():
 
 def start_bot():
     cnf = Config()
-    bot = Bot(cnf._bot_token, cnf._api_id,
-              cnf._api_hash, cnf._db_path, 'user.db')
+    api = Api(cnf._api_id, cnf._api_hash)
+    bot = Bot(api, cnf._bot_token,  cnf._db_path, 'user.db')
     bot.run()
 
 
