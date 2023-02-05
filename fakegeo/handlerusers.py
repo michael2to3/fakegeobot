@@ -6,6 +6,7 @@ from arg import Arg
 from checkin import CheckIn
 from session import Session
 from user import User
+import logging
 
 
 class WrapperUser:
@@ -14,6 +15,7 @@ class WrapperUser:
 
 
 class HandlerUsers:
+    logger: logging.Logger
     _users: Dict[int, WrapperUser]
     _checkin: CheckIn
     _session: Session
@@ -24,6 +26,7 @@ class HandlerUsers:
         self._checkin = CheckIn()
         self._session = Session(path_db, name_db)
         self._parse = Arg()
+        self.logger = logging.getLogger(__name__)
 
     def __del__(self):
         for user in self._users.values():
@@ -34,7 +37,12 @@ class HandlerUsers:
         self._users[chat_id]._user._info._auth_code = code
         self._session.save(self._users[chat_id]._user)
 
-        # TODO start session on telethon
+    def start_tg_client(self, chat_id: int):
+        user = self._users[chat_id]._user
+        client = user.instance_telegramclient()
+        phone = user._info._phone
+        code = user._info._auth_code
+        client.start(lambda: phone, code_callback=lambda: code)
 
     def change_phone(self, chat_id: int, text: str):
         phone = self._parse.get_phone(text)
@@ -75,9 +83,14 @@ class HandlerUsers:
         self._users[chat_id]._cron = self._checkin.run(user)
 
     async def delete(self, chat_id: int):
-        self.disable(chat_id)
-        await self._users[chat_id]._user.instance_telegramclient().log_out()
+        try:
+            self.disable(chat_id)
+            await self._users[chat_id]._user.instance_telegramclient().log_out()
+        except Exception as e:
+            self.logger.error(str(e))
+
         self._session.delete(chat_id)
+        del self._users[chat_id]
 
     def enable(self, chat_id: int):
         self._users[chat_id]._user._info._active = True
