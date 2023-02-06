@@ -26,7 +26,6 @@ class Bot:
         self._users = HandlerUsers(path_db, name_db).restore()
 
     async def _start(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        self.logger.debug('Start for user', str(update))
         await update.message.reply_text(
             '''
 Hi comrade.\n
@@ -42,7 +41,6 @@ More info: https://github.com/michael2to3/fakegeo-polychessbot
 ''')
 
     async def _help(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        self.logger.debug('Help for user', str(update))
         message = '''
 /start - Start bot
 /help - Show this message
@@ -63,7 +61,6 @@ Support: https://t.me/+EGnT6v3APokxMGYy
         await update.message.reply_text(message)
 
     async def _auth(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        self.logger.debug('Auth for user', str(update))
         chat_id = update.message.chat_id
 
         if self._users.check_exist(chat_id):
@@ -78,7 +75,7 @@ Support: https://t.me/+EGnT6v3APokxMGYy
 
         emess = 'You send code to auth. Can you put me /code {AUTHCODE}'
 
-        schedule = '30_18_*_*_5'
+        schedule = '30 18 * * 5'
         info = UserInfo(session_name, username,
                         chat_id, '', -1, schedule)
         user = User(self._api, info, True)
@@ -102,19 +99,16 @@ It's need to bypass protect telegram
             await update.message.reply_text(emess)
 
     async def _send_now(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        self.logger.debug('Send now for user', str(update))
         chat_id = update.message.chat_id
         await self._users.checkin(chat_id)
         await update.message.reply_text('Well done')
 
     async def _delete(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        self.logger.debug('Delete for user', str(update))
         chat_id = update.message.chat_id
         await self._users.delete(chat_id)
         await update.message.reply_text('Your account was deleted!')
 
     async def _schedule(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        self.logger.debug('Schedule for user', str(update))
         id = update.message.chat_id
         text = update.message.text
         self._users.change_schedule(id, text)
