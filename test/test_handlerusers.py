@@ -1,4 +1,5 @@
 import unittest
+import asyncio
 from random import randint
 from rootpath import fakegeo
 HandlerUsers = fakegeo.HandlerUsers
@@ -7,6 +8,10 @@ Session = fakegeo.Session
 User = fakegeo.User
 UserInfo = fakegeo.type.UserInfo
 Api = fakegeo.type.Api
+
+
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 
 
 def make_user(username: str, chat_id: int) -> User:
