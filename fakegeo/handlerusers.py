@@ -94,6 +94,9 @@ class HandlerUsers:
     async def delete(self, chat_id: int):
         try:
             self.disable(chat_id)
+        except Exception as e:
+            self.logger.error(str(e))
+        try:
             await self._users[chat_id]._user.instance_telegramclient().log_out()
         except Exception as e:
             self.logger.error(str(e))
