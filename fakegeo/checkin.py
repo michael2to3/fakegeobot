@@ -16,7 +16,6 @@ class CheckIn:
         self.logger = logging.getLogger(__name__)
 
     async def send_live_location(self, user: TelegramClient) -> None:
-        self.logger.debug('Send live location', str(user))
         geo = Geolocation()
         # Well... Ignore error from library tg, it's ok
         # Still send InputMediaGeoLive
@@ -26,7 +25,6 @@ class CheckIn:
             file=stream)
 
     def run(self, user: User):
-        self.logger.debug('Run schedule for ', str(user))
         cron: str = user._info._schedule
         tg = user.instance_telegramclient()
         def func(): return self.send_live_location(tg)
