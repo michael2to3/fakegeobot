@@ -23,7 +23,6 @@ class Session:
         return sqlite3.connect(self._path_db)
 
     def create_table(self):
-        self.logger.debug('Create table')
         con = self.connect()
         con.cursor().execute('''
             CREATE TABLE IF NOT EXISTS users (
@@ -43,7 +42,6 @@ class Session:
         return self
 
     def _insert(self, user: User):
-        self.logger.debug('Create user', str(user))
         api = user._api
         info = user._info
         active = user._active
@@ -77,7 +75,6 @@ class Session:
         return self
 
     def _update(self, user: User):
-        self.logger.debug('Update user data', str(user))
         api = user._api
         info = user._info
         active = user._active
@@ -118,7 +115,6 @@ class Session:
         return self
 
     def delete(self, chat_id: int):
-        self.logger.debug('Remove user ', str(chat_id))
         sid = str(chat_id)
         sql = 'DELETE FROM users WHERE chat_id=?'
         con = self.connect()
@@ -127,7 +123,6 @@ class Session:
         con.close()
 
     def load_all(self) -> Iterable[User]:
-        self.logger.debug('Load add users')
         con = self.connect()
         cursor = con.cursor()
         cursor.execute('SELECT * FROM users')
@@ -137,7 +132,6 @@ class Session:
             yield self._generate(row)
 
     def load(self, chat_id: int) -> User:
-        self.logger.debug('Load user with chat_id ', str(chat_id))
         id = str(chat_id)
         con = self.connect()
         cursor = con.cursor()
@@ -148,7 +142,6 @@ class Session:
         return self._generate(row)
 
     def check_exists(self, chat_id: int) -> bool:
-        self.logger.debug('Load user with chat_id ', str(chat_id))
         id = str(chat_id)
         con = self.connect()
         cursor = con.cursor()

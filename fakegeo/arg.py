@@ -8,8 +8,6 @@ class Arg:
         self.logger = logging.getLogger(__name__)
 
     def get_phone(self, text: str) -> str:
-        self.logger.debug('Get phone from string', text)
-
         def remove_junk(utext: str) -> str:
             junk = [' ', '(', ')', '_']
             for i in junk:
@@ -34,8 +32,6 @@ class Arg:
         return preffix + phone
 
     def get_auth_code(self, text: str) -> int:
-        self.logger.debug('Get auth code from string', text)
-
         code = text
         index_first_digit = [i.isdigit() for i in code].index(True)
 
