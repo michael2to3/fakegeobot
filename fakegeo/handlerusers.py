@@ -43,7 +43,7 @@ class HandlerUsers:
         client = user.instance_telegramclient()
         phone = user._info._phone
         code = user._info._auth_code
-        client.start(lambda: phone, code_callback=lambda: code)
+        client.start(phone, code_callback=lambda: str(code))
 
     def change_phone(self, chat_id: int, text: str):
         phone = self._parse.get_phone(text)
@@ -59,14 +59,6 @@ class HandlerUsers:
     async def checkin(self, chat_id: int):
         if self.check_exist(chat_id):
             client = self._users[chat_id]._user.instance_telegramclient()
-            phone = self._users[chat_id]._user._info._phone
-            code = self._users[chat_id]._user._info._auth_code
-            self.logger.debug('Checkin', phone, code)
-            try:
-                client.start()
-            except SessionPasswordNeededError:
-                client.start(phone=lambda: phone,
-                             password=lambda: str(code), code_callback=lambda: code)
             await self._checkin.send_live_location(client)
 
     def change_user(self, user: User):
@@ -85,7 +77,7 @@ class HandlerUsers:
         user = self._users[chat_id]._user
         phone = self._users[chat_id]._user._info._phone
         await user.instance_telegramclient().connect()
-        await user.instance_telegramclient().send_code_request(phone, force_sms=True)
+        await user.instance_telegramclient().send_code_request(phone)
 
     def start_cron(self, chat_id: int):
         user = self._users[chat_id]._user
