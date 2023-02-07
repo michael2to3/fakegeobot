@@ -4,7 +4,7 @@ from telegram.ext import (
     CommandHandler,
     ContextTypes,
 )
-from telethon.errors import FloodWaitError
+from telethon.errors import AuthKeyUnregisteredError, FloodWaitError
 
 from handlerusers import HandlerUsers
 from session_name import SessionName
@@ -75,7 +75,7 @@ Support: https://t.me/+EGnT6v3APokxMGYy
 
         emess = 'You send code to auth. Can you put me /code {AUTHCODE}'
 
-        schedule = '30 18 * * 5'
+        schedule = '30 18 * * 6'
         info = UserInfo(session_name, username,
                         chat_id, '', -1, schedule)
         user = User(self._api, info, True)
@@ -93,6 +93,8 @@ It's need to bypass protect telegram
 '''
         except RuntimeError:
             emess = 'Oops bad try access your account'
+        except ValueError:
+            emess = 'Not correct message'
         except FloodWaitError as e:
             emess = f'Oops flood exception! Wait: {e.seconds} seconds'
         finally:
@@ -100,8 +102,14 @@ It's need to bypass protect telegram
 
     async def _send_now(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
-        await self._users.checkin(chat_id)
-        await update.message.reply_text('Well done')
+        emess = 'Well done'
+        try:
+            await self._users.checkin(chat_id)
+        except AuthKeyUnregisteredError as e:
+            self.logger.error(str(e))
+            emess = 'Your token is not registered'
+        finally:
+            await update.message.reply_text(emess)
 
     async def _delete(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
