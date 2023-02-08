@@ -49,10 +49,15 @@ class HandlerUsers:
         self._users[chat_id]._user._info._phone = phone
 
     def change_schedule(self, chat_id: int, schedule: str):
-        self._users[chat_id]._cron.stop()
-        self._users[chat_id]._user._info._schedule = schedule
-        cron = self._checkin.run(self._users[chat_id]._user)
-        self._users[chat_id]._cron = cron
+        user = self._users[chat_id]
+        cron = user._cron
+        if cron:
+            user._cron.stop()
+        user._user._info._schedule = schedule
+        cron = self._checkin.run(user._user)
+        user._cron = cron
+
+        self._users[chat_id] = user
 
     async def checkin(self, chat_id: int):
         if self.check_exist(chat_id):
