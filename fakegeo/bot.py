@@ -64,7 +64,7 @@ Support: https://t.me/+EGnT6v3APokxMGYy
         chat_id = update.message.chat_id
 
         if self._users.check_exist(chat_id):
-            emess = "U already auth"
+            emess = 'You already auth, if you want reauth you can /delete self'
             await update.message.reply_text(emess)
             return
 
