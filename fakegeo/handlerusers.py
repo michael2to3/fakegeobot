@@ -47,7 +47,6 @@ class HandlerUsers:
     def change_phone(self, chat_id: int, text: str):
         phone = self._parse.get_phone(text)
         self._users[chat_id]._user._info._phone = phone
-        self._session.save(self._users[chat_id]._user)
 
     def change_schedule(self, chat_id: int, schedule: str):
         self._users[chat_id]._cron.stop()
@@ -57,8 +56,10 @@ class HandlerUsers:
 
     async def checkin(self, chat_id: int):
         if self.check_exist(chat_id):
-            client = self._users[chat_id]._user.instance_telegramclient()
-            await self._checkin.send_live_location(client)
+            user = self._users[chat_id]._user
+            await self._checkin.send_live_location(user)
+        else:
+            raise ValueError('User not exist')
 
     def change_user(self, user: User):
         chat_id = user._info._chat_id
@@ -81,8 +82,9 @@ class HandlerUsers:
     async def require_code(self, chat_id: int):
         user = self._users[chat_id]._user
         phone = self._users[chat_id]._user._info._phone
-        await user.instance_telegramclient().connect()
-        await user.instance_telegramclient().send_code_request(phone)
+        client = user.instance_telegramclient()
+        await client.connect()
+        await client.send_code_request(phone)
 
     def start_cron(self, chat_id: int):
         user = self._users[chat_id]._user
@@ -126,7 +128,11 @@ class HandlerUsers:
         for user in users:
             if user._active:
                 chat_id = user._info._chat_id
-                self._users[chat_id]._cron = self._checkin.run(user)
+                user = self._users[chat_id]
+
+                user._cron = self._checkin.run(user)
+                self._users[chat_id] = user
+
         return self
 
     def check_exist(self, chat_id: int):
