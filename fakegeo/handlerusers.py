@@ -1,7 +1,6 @@
 from typing import Dict
 
 from aiocron import Cron
-from telethon.errors import SessionPasswordNeededError
 
 from arg import Arg
 from checkin import CheckIn
@@ -71,6 +70,12 @@ class HandlerUsers:
             self._users[chat_id]._cron = self._checkin.pass_cron()
 
         self._users[chat_id]._user = user
+
+    def save(self, chat_id: int):
+        if chat_id not in self._users:
+            raise ValueError('User is not found')
+
+        user = self._users[chat_id]._user
         self._session.save(user)
 
     async def require_code(self, chat_id: int):
@@ -88,8 +93,10 @@ class HandlerUsers:
             self.disable(chat_id)
         except Exception as e:
             self.logger.error(str(e))
+
+        client = self._users[chat_id]._user.instance_telegramclient()
         try:
-            await self._users[chat_id]._user.instance_telegramclient().log_out()
+            await client.log_out()
         except Exception as e:
             self.logger.error(str(e))
 

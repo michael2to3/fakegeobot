@@ -97,6 +97,8 @@ It's need to bypass protect telegram
             emess = 'Not correct message'
         except FloodWaitError as e:
             emess = f'Oops flood exception! Wait: {e.seconds} seconds'
+        else:
+            self._users.save(chat_id)
         finally:
             await update.message.reply_text(emess)
 
