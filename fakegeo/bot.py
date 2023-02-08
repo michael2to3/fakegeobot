@@ -1,3 +1,6 @@
+import logging
+from croniter.croniter import CroniterBadCronError, CroniterNotAlphaError
+
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -10,7 +13,6 @@ from handlerusers import HandlerUsers
 from session_name import SessionName
 from type import Api, UserInfo
 from user import User
-import logging
 
 
 class Bot:
@@ -126,7 +128,26 @@ It's need to bypass protect telegram
     async def _schedule(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         id = update.message.chat_id
         text = update.message.text
-        self._users.change_schedule(id, text)
+
+        emess = 'Done!'
+        try:
+            self._users.change_schedule(id, text)
+        except CroniterNotAlphaError as e:
+            self.logger.error(str(e))
+            emess = 'Error, schedule not change'
+        except CroniterBadCronError as e:
+            self.logger.error(str(e))
+            emess = 'Not valid range'
+        except ValueError as e:
+            self.logger.error(str(e))
+            emess = str(e)
+        except Exception as e:
+            emess = 'Oops unknown error'
+            self.logger.error(e)
+        else:
+            self._users.save(id)
+
+        await update.message.reply_text(emess)
 
     async def _raw_code(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         text = update.message.text

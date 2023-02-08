@@ -34,8 +34,7 @@ class CheckIn:
 
     def run(self, user: User):
         cron: str = user._info._schedule
-        client = user.instance_telegramclient()
-        def func(): return self.send_live_location(client)
+        def func(): return self.send_live_location(user)
         return crontab(cron, func=func, start=True)
 
     def pass_cron(self):

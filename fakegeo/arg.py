@@ -50,3 +50,10 @@ class Arg:
 
     def bypass_protect_tg(self, text: str) -> str:
         return text.replace('.', '')
+
+    def get_cron(self, text: str) -> str:
+        index_space = text.find(' ')
+        sch = text[index_space+1:]
+        if len(sch) < 9:
+            raise ValueError('Not valid format of cron')
+        return sch

@@ -13,6 +13,10 @@ class WrapperUser:
     _user: User
     _cron: Cron
 
+    def __init__(self, user: User, cron: Cron):
+        self._user = user
+        self._cron = cron
+
 
 class HandlerUsers:
     logger: logging.Logger
@@ -41,8 +45,9 @@ class HandlerUsers:
         phone = self._parse.get_phone(text)
         self._users[chat_id]._user._info._phone = phone
 
-    def change_schedule(self, chat_id: int, schedule: str):
+    def change_schedule(self, chat_id: int, text: str):
         user = self._users[chat_id]
+        schedule = self._parse.get_cron(text)
         cron = user._cron
         if cron:
             user._cron.stop()
@@ -64,11 +69,10 @@ class HandlerUsers:
 
         if self.check_exist(chat_id):
             self._users[chat_id]._cron.stop()
+            self._users[chat_id]._user = user
         else:
-            self._users[chat_id] = WrapperUser()
-            self._users[chat_id]._cron = self._checkin.pass_cron()
-
-        self._users[chat_id]._user = user
+            pass_cron = self._checkin.pass_cron()
+            self._users[chat_id] = WrapperUser(user, pass_cron)
 
     def save(self, chat_id: int):
         if chat_id not in self._users:
@@ -117,8 +121,8 @@ class HandlerUsers:
         users = self._session.load_all()
 
         def generate_wrap(user):
-            wrap = WrapperUser()
-            wrap._user = user
+            pass_cron = self._checkin.pass_cron()
+            wrap = WrapperUser(user, pass_cron)
             return wrap
 
         self._users = dict([(i._info._chat_id, generate_wrap(i))
