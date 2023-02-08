@@ -39,8 +39,8 @@ class HandlerUsersTest(unittest.TestCase):
     def make_user(self, username: str, chat_id: int) -> User:
         return make_user(username, chat_id)
 
-    def make_handler(self, name_db: str | None = None):
-        if name_db is None:
+    def make_handler(self, name_db: str = ''):
+        if name_db == '':
             name_db = self._name_db
         return make_handler(self._path_db, name_db)
 
