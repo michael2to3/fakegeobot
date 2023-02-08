@@ -136,7 +136,6 @@ It's need to bypass protect telegram
         users = self._users
         try:
             users.change_auth_code(chat_id, text)
-            users.start_tg_client(chat_id)
             default_sch = '30 18 * * 6'
             users.change_schedule(chat_id, default_sch)
         except ValueError:
