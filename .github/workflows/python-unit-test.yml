@@ -18,7 +18,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-        pip install sqlite3
 
     - name: Run tests
       run: |
