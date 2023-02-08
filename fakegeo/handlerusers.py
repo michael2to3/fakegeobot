@@ -84,7 +84,7 @@ class HandlerUsers:
     async def require_code(self, chat_id: int):
         user = self._users[chat_id]._user
         phone = self._users[chat_id]._user._info._phone
-        client = user.instance_telegramclient()
+        client = user.instance_telegramclient
         await client.connect()
         await client.send_code_request(phone)
 
@@ -98,7 +98,7 @@ class HandlerUsers:
         except Exception as e:
             self.logger.error(str(e))
 
-        client = self._users[chat_id]._user.instance_telegramclient()
+        client = self._users[chat_id]._user.instance_telegramclient
         try:
             await client.log_out()
         except Exception as e:

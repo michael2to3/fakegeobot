@@ -17,7 +17,7 @@ class CheckIn:
 
     async def send_live_location(self, user: User) -> None:
 
-        client = user.instance_telegramclient()
+        client = user.instance_telegramclient
         phone_number = user._info._phone
         auth_code = user._info._auth_code
 

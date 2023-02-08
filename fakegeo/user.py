@@ -7,13 +7,14 @@ from type import UserInfo
 class User:
     _api: Api
     _info: UserInfo
-    _clients:  Dict[str, TelegramClient]
     _active: bool
+    _clients:  Dict[str, TelegramClient]
 
     def __init__(self, api: Api, info: UserInfo, active: bool):
         self._api = api
         self._info = info
         self._active = active
+        self._clients = {}
 
     @property
     def instance_telegramclient(self):
@@ -25,7 +26,7 @@ class User:
         key = session_name
         if key not in self._clients:
             self._clients[key] = TelegramClient(
-                self.name, self.api_id, self.api_hash)
+                session_name, api_id, api_hash)
         return self._clients[key]
 
     def __getattr__(self, name: str):
