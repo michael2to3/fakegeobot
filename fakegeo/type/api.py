@@ -11,3 +11,7 @@ class Api:
 
     def __setattr__(self, name: str, value):
         self.__dict__[name] = value
+
+    def __iter__(self):
+        yield self._id
+        yield self._hash

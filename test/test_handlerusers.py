@@ -83,6 +83,7 @@ class HandlerUsersTest(unittest.TestCase):
     def test_change_schedule(self):
         chat_id = 123456
         new_sch = '/schedule * * * * *'
+        format_sch = '* * * * *'
         username = 'username'
 
         user = self.make_user(username, chat_id)
@@ -92,7 +93,7 @@ class HandlerUsersTest(unittest.TestCase):
         handler.change_schedule(chat_id, new_sch)
 
         sch = handler.get_user(chat_id)._info._schedule
-        self.assertEqual(sch, new_sch)
+        self.assertEqual(sch, format_sch)
 
     def test_checkin(self):
         pass
