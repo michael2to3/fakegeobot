@@ -37,13 +37,6 @@ class HandlerUsers:
         self._users[chat_id]._user._info._auth_code = code
         self._session.save(self._users[chat_id]._user)
 
-    def start_tg_client(self, chat_id: int):
-        user = self._users[chat_id]._user
-        client = user.instance_telegramclient()
-        phone = user._info._phone
-        code = user._info._auth_code
-        client.start(phone, code_callback=lambda: str(code))
-
     def change_phone(self, chat_id: int, text: str):
         phone = self._parse.get_phone(text)
         self._users[chat_id]._user._info._phone = phone
