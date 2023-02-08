@@ -18,11 +18,13 @@ class Bot:
     _api: Api
     _app: Application
     _users: HandlerUsers
+    _path_db: str
 
     def __init__(self, api: Api, token: str, path_db: str, name_db: str):
         self.logger = logging.getLogger(__name__)
         self._app = Application.builder().token(token).build()
         self._api = api
+        self._path_db = path_db
         self._users = HandlerUsers(path_db, name_db).restore()
 
     async def _start(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
@@ -69,7 +71,7 @@ Support: https://t.me/+EGnT6v3APokxMGYy
             return
 
         username = update.message.from_user.full_name
-        session_name = SessionName().get_session_name()
+        session_name = self._path_db + SessionName().get_session_name()
 
         text = update.message.text
 
@@ -110,6 +112,9 @@ It's need to bypass protect telegram
         except AuthKeyUnregisteredError as e:
             self.logger.error(str(e))
             emess = 'Your token is not registered'
+        except Exception as e:
+            self.logger.error(str(e))
+            emess = 'Oops something went wrong'
         finally:
             await update.message.reply_text(emess)
 
@@ -128,12 +133,12 @@ It's need to bypass protect telegram
         chat_id = update.message.chat_id
         emess = 'Success! Code complete!'
 
-        user = self._users
+        users = self._users
         try:
-            user.change_auth_code(chat_id, text)
-            user.start_tg_client(chat_id)
+            users.change_auth_code(chat_id, text)
+            users.start_tg_client(chat_id)
             default_sch = '30 18 * * 5'
-            user.change_schedule(chat_id, default_sch)
+            users.change_schedule(chat_id, default_sch)
         except ValueError:
             emess = 'Bad value of command'
         except KeyError:
