@@ -52,8 +52,11 @@ class Arg:
         return text.replace('.', '')
 
     def get_cron(self, text: str) -> str:
-        index_space = text.find(' ')
-        sch = text[index_space+1:]
+        has_cmd = text.lstrip()[0] == '/'
+        sch = text
+        if has_cmd:
+            findex = text.find(' ')
+            sch = text[findex+1:]
         if len(sch) < 9:
             raise ValueError('Not valid format of cron')
         return sch

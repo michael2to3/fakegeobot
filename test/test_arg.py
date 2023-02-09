@@ -56,3 +56,14 @@ class ArgTest(unittest.TestCase):
 
         text = '/asd 7648'
         self.assertRaises(ValueError, self._arg.get_auth_code, text)
+
+        text = '/asd 2.7.5.0.5'
+        self.assertEqual(self._arg.get_auth_code(text), 27505)
+
+    def test_schedule(self):
+        ptext = '30 18 * * 6'
+        self.assertEqual(self._arg.get_cron(ptext), ptext)
+        text = '/cmd 30 18 * * 6'
+        self.assertEqual(self._arg.get_cron(text), ptext)
+        text = '18 * * 6'
+        self.assertRaises(ValueError, self._arg.get_cron, text)
