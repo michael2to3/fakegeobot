@@ -1,5 +1,7 @@
 from random import choice
 
+import hashlib
+
 
 class SessionName:
     _length: int
@@ -17,6 +19,12 @@ class SessionName:
 
     def _get_random_char(self) -> str:
         return choice(self._allow_char)
+
+    def _get_md5(self, text: str) -> str:
+        return hashlib.md5(text.encode('utf-8')).hexdigest()
+
+    def get_session_name_base(self, base: str) -> str:
+        return self._get_md5(base)
 
     def get_session_name(self):
         union_name = ''
