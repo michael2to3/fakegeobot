@@ -7,6 +7,9 @@ from threading import Thread
 import sys
 import logging
 from decouple import config
+import nest_asyncio
+
+nest_asyncio.apply()
 
 
 def setup_logging():
@@ -16,31 +19,41 @@ def setup_logging():
         logging.basicConfig(level=logging.WARN)
 
 
-def start_cron():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_forever()
-
-
 def get_root_path():
     root = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(root, '..')
 
 
-def start_bot():
+def generate_bot():
     root = get_root_path()
     cnf = Config()
     api = Api(cnf._api_id, cnf._api_hash)
     bot = Bot(api, cnf._bot_token,  os.path.join(
         root, cnf._db_path), 'user.db')
+    return bot
+
+
+def start_bot():
+    bot = generate_bot()
     bot.run()
 
 
-if __name__ == '__main__':
-    setup_logging()
-    tcron = Thread(target=start_cron)
+def worker(ws, loop):
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(ws())
 
-    tcron.start()
+
+def start_cron():
+    run = asyncio.get_event_loop().run_forever
+    loop = asyncio.new_event_loop()
+    thread = Thread(target=worker, args=(run, loop,))
+    thread.start()
+
+
+async def main():
+    setup_logging()
+    start_cron()
     start_bot()
 
-    tcron.join()
+if __name__ == '__main__':
+    asyncio.run(main())
