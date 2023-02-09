@@ -54,7 +54,7 @@ class HandlerUsers:
         schedule = self._parse.get_cron(text)
         cron = user._cron
         if cron:
-            user._cron.stop()
+            cron.stop()
         user._user._info._schedule = schedule
         cron = self._checkin.run(user._user)
         user._cron = cron
