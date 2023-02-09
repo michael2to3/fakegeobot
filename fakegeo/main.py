@@ -1,4 +1,5 @@
 from bot import Bot
+import os
 from config import Config
 from type import Api
 import asyncio
@@ -21,10 +22,18 @@ def start_cron():
     loop.run_forever()
 
 
+def get_root_path():
+    root = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(root, '..')
+
+
 def start_bot():
+    root = get_root_path()
     cnf = Config()
+    print(os.path.join(root, cnf._db_path))
     api = Api(cnf._api_id, cnf._api_hash)
-    bot = Bot(api, cnf._bot_token,  cnf._db_path, 'user.db')
+    bot = Bot(api, cnf._bot_token,  os.path.join(
+        root, cnf._db_path), 'user.db')
     bot.run()
 
 
