@@ -1,4 +1,5 @@
 import logging
+from typing import Callable, Coroutine, List, Dict, Set
 from croniter.croniter import CroniterBadCronError, CroniterNotAlphaError
 
 from telegram import Update
@@ -190,14 +191,19 @@ It's need to bypass protect telegram
 
     def run(self) -> None:
         app = self._app
-        app.add_handler(CommandHandler('start', self._start))
-        app.add_handler(CommandHandler('help', self._help))
-        app.add_handler(CommandHandler('auth', self._auth))
-        app.add_handler(CommandHandler('code', self._raw_code))
-        app.add_handler(CommandHandler('schedule', self._schedule))
-        app.add_handler(CommandHandler('send', self._send_now))
-        app.add_handler(CommandHandler('disable', self._disable))
-        app.add_handler(CommandHandler('enable', self._enable))
-        app.add_handler(CommandHandler('delete', self._delete))
+        commands = [
+            ('start', self._start),
+            ('help', self._help),
+            ('auth', self._auth),
+            ('code', self._raw_code),
+            ('schedule', self._schedule),
+            ('send', self._send_now),
+            ('disable', self._disable),
+            ('enable', self._enable),
+            ('delete', self._delete),
+        ]
+
+        for name, func in commands:
+            app.add_handler(CommandHandler(name, func))
 
         app.run_polling()
