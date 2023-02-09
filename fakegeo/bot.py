@@ -73,7 +73,8 @@ Support: https://t.me/+EGnT6v3APokxMGYy
             return
 
         username = update.message.from_user.full_name
-        session_name = self._path_db + SessionName().get_session_name()
+        sid = str(chat_id)
+        session_name = self._path_db + SessionName().get_session_name_base(sid)
 
         text = update.message.text
 
@@ -81,13 +82,14 @@ Support: https://t.me/+EGnT6v3APokxMGYy
 
         schedule = '30 18 * * 6'
         info = UserInfo(session_name, username,
-                        chat_id, '', -1, schedule)
+                        chat_id, '', -1, schedule, '')
         user = User(self._api, info, True)
 
         try:
             self._users.change_user(user)
             self._users.change_phone(chat_id, text)
-            await self._users.require_code(chat_id)
+            phone_code_hash = await self._users.require_code(chat_id)
+            self._users.change_phone_code_hash(chat_id, phone_code_hash)
 
             emess = '''
 Send me auth code each char separated by a dot

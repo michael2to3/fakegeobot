@@ -4,6 +4,7 @@ from aiocron import Cron
 
 from arg import Arg
 from checkin import CheckIn
+from proxytelegram import ProxyTelegram
 from session import Session
 from user import User
 import logging
@@ -40,6 +41,9 @@ class HandlerUsers:
         code = self._parse.get_auth_code(text)
         self._users[chat_id]._user._info._auth_code = code
         self._session.save(self._users[chat_id]._user)
+
+    def change_phone_code_hash(self, chat_id: int, text: str):
+        self._users[chat_id]._user._info._phone_code_hash = text
 
     def change_phone(self, chat_id: int, text: str):
         phone = self._parse.get_phone(text)
@@ -81,12 +85,14 @@ class HandlerUsers:
         user = self._users[chat_id]._user
         self._session.save(user)
 
-    async def require_code(self, chat_id: int):
+    async def require_code(self, chat_id: int) -> str:
         user = self._users[chat_id]._user
         phone = self._users[chat_id]._user._info._phone
-        client = user.instance_telegramclient
+        client = ProxyTelegram.get_client(user)
         await client.connect()
-        await client.send_code_request(phone)
+        req = await client.send_code_request(phone)
+        phone_code_hash = req.phone_code_hash
+        return phone_code_hash
 
     def start_cron(self, chat_id: int):
         user = self._users[chat_id]._user
@@ -98,7 +104,8 @@ class HandlerUsers:
         except Exception as e:
             self.logger.error(str(e))
 
-        client = self._users[chat_id]._user.instance_telegramclient
+        user = self._users[chat_id]._user
+        client = ProxyTelegram.get_client(user)
         try:
             await client.log_out()
         except Exception as e:
@@ -126,7 +133,7 @@ class HandlerUsers:
             return wrap
 
         self._users = dict([(i._info._chat_id, generate_wrap(i))
-                           for i in users if i._active])
+                            for i in users if i._active])
         for user in users:
             if user._active:
                 chat_id = user._info._chat_id

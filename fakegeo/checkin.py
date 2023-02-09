@@ -1,8 +1,8 @@
 import logging
 
 from aiocron import crontab
-from telethon.sync import TelegramClient
 from telethon.types import InputMediaGeoLive
+from proxytelegram import ProxyTelegram
 
 from geolocation import Geolocation
 from user import User
@@ -17,12 +17,13 @@ class CheckIn:
 
     async def send_live_location(self, user: User) -> None:
 
-        client = user.instance_telegramclient
         phone_number = user._info._phone
         auth_code = user._info._auth_code
+        hash = user._info._phone_code_hash
 
+        client = ProxyTelegram.get_client(user)
         await client.connect()
-        client.start(phone_number, code_callback=lambda: auth_code)
+        await client.sign_in(phone_number, auth_code, phone_code_hash=hash)
 
         geo = Geolocation()
         # Well... Ignore error from library tg, it's ok

@@ -34,7 +34,8 @@ class Session:
                 phone TEXT,
                 auth_code INTEGER,
                 schedule TEXT,
-                active BOOLEAN
+                active BOOLEAN,
+                phone_code_hash TEXT
                 )
         ''')
         con.commit()
@@ -56,9 +57,10 @@ class Session:
                 phone,
                 auth_code,
                 schedule,
-                active
+                active,
+                phone_code_hash
  )
-            VALUES (?,?,?,?,?,?,?,?,?)
+            VALUES (?,?,?,?,?,?,?,?,?,?)
         ''', (
             api._id,
             api._hash,
@@ -68,7 +70,8 @@ class Session:
             info._phone,
             info._auth_code,
             info._schedule,
-            str(int(active))
+            str(int(active)),
+            info._phone_code_hash
         ))
         con.commit()
         con.close()
@@ -88,7 +91,8 @@ class Session:
                 phone=?,
                 auth_code=?,
                 schedule=?,
-                active=?
+                active=?,
+                phone_code_hash=?
             WHERE chat_id=?
         ''', (
             api._id,
@@ -99,7 +103,8 @@ class Session:
             info._auth_code,
             info._schedule,
             str(int(active)),
-            str(info._chat_id)
+            info._phone_code_hash,
+            str(info._chat_id),
         ))
         con.commit()
         con.close()
@@ -107,7 +112,7 @@ class Session:
     def save(self, user: User):
         chat_id = user._info._chat_id
 
-        if self.check_exists(chat_id):
+        if self.check_exist(chat_id):
             self._update(user)
         else:
             self._insert(user)
@@ -141,7 +146,7 @@ class Session:
 
         return self._generate(row)
 
-    def check_exists(self, chat_id: int) -> bool:
+    def check_exist(self, chat_id: int) -> bool:
         id = str(chat_id)
         con = self.connect()
         cursor = con.cursor()
@@ -163,7 +168,8 @@ class Session:
          phone,
          auth_code,
          schedule,
-         active) = row
+         active,
+         phone_code_hash) = row
 
         user_info = UserInfo(
             session_name,
@@ -171,7 +177,8 @@ class Session:
             int(chat_id),
             phone,
             auth_code,
-            schedule
+            schedule,
+            phone_code_hash
         )
         api = Api(api_id, api_hash)
         return User(api, user_info, active)

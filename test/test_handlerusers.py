@@ -22,7 +22,8 @@ def make_user(username: str, chat_id: int) -> User:
         chat_id=chat_id,
         phone='+79992132531',
         auth_code=76481,
-        schedule='* * * * *'
+        schedule='* * * * *',
+        phone_code_hash=''
     )
     api = Api(api_id=12345678, api_hash='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     return User(api, info, True)
