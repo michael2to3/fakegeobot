@@ -30,7 +30,6 @@ def get_root_path():
 def start_bot():
     root = get_root_path()
     cnf = Config()
-    print(os.path.join(root, cnf._db_path))
     api = Api(cnf._api_id, cnf._api_hash)
     bot = Bot(api, cnf._bot_token,  os.path.join(
         root, cnf._db_path), 'user.db')
