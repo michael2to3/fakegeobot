@@ -1,12 +1,12 @@
 import logging
-from typing import Callable, Coroutine, List, Dict, Set
+from sqlite3 import OperationalError
 from croniter.croniter import CroniterBadCronError, CroniterNotAlphaError
 
 from telegram import Update
 from telegram.ext import (
     Application,
     CommandHandler,
-    ContextTypes,
+    ContextTypes
 )
 from telethon.errors import AuthKeyUnregisteredError, FloodWaitError
 
@@ -28,7 +28,8 @@ class Bot:
         self._app = Application.builder().token(token).build()
         self._api = api
         self._path_db = path_db
-        self._users = HandlerUsers(path_db, name_db).restore()
+        self._users = HandlerUsers(path_db, name_db)
+        self._users.restore()
 
     async def _start(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
@@ -79,7 +80,12 @@ Support: https://t.me/+EGnT6v3APokxMGYy
 
         text = update.message.text
 
-        emess = 'You send code to auth. Can you put me /code {AUTHCODE}'
+        emess = '''
+Send me auth code each char separated by a dot
+For example: Login code: 61516
+You put: /code 6.1.5.1.6
+It's need to bypass protect telegram
+'''
 
         schedule = '30 18 * * 6'
         info = UserInfo(session_name, username,
@@ -92,18 +98,15 @@ Support: https://t.me/+EGnT6v3APokxMGYy
             phone_code_hash = await self._users.require_code(chat_id)
             self._users.change_phone_code_hash(chat_id, phone_code_hash)
 
-            emess = '''
-Send me auth code each char separated by a dot
-For example: Login code: 61516
-You put: /code 6.1.5.1.6
-It's need to bypass protect telegram
-'''
         except RuntimeError:
             emess = 'Oops bad try access your account'
         except ValueError:
             emess = 'Not correct message'
         except FloodWaitError as e:
             emess = f'Oops flood exception! Wait: {e.seconds} seconds'
+        except OperationalError as e:
+            self.logger.error(str(e))
+            emess = 'Oops database is fire!'
         else:
             self._users.save(chat_id)
         finally:
@@ -131,6 +134,11 @@ It's need to bypass protect telegram
     async def _schedule(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         id = update.message.chat_id
         text = update.message.text
+
+        if text.find(' ') == -1:
+            sch = f'Your schedule {self._users.get_user(id)._info._schedule}'
+            await update.message.reply_text(sch)
+            return
 
         emess = 'Done!'
         try:
