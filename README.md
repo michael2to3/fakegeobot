@@ -14,12 +14,28 @@ This bot was created to help users bypass location checks in various application
 - [python-decouple](https://github.com/HBNetwork/python-decouple)
 - [Telethon](https://github.com/LonamiWebs/Telethon)
 
+
+## Telegram API
+- You need to create an API client to use this script. You can do it by following these steps:
+  1. Go to [my.telegram.org](https://my.telegram.org/)
+  2. Log in using your Telegram account
+  3. Click on `API Development Tools`
+  4. Fill in the required fields and create your API client
+  5. Replace `YOUR_API_ID` and `YOUR_API_HASH` in the `docker-copose.yml` or `main.py`
+
 ## Usage
 1. Clone this repository
 2. Run `pip install -r requirements.txt` to install required packages
 3. Create a bot in Telegram and get your API key
 4. Set your API key as an environment variable with the name `BOT_TOKEN`, `API_ID`, `API_HASH` and `SQLITE_PATH`
 5. Run the bot using `python ./fakegeo/main.py`
+
+## Docker
+- Build the container using the command `docker build -t your_image_name .`
+- Run the container using the command `docker run your_image_name`
+
+## Docker compose
+- Run with docker compose using the command `docker-compose up -d --build`
 
 ## Start unit test
 
