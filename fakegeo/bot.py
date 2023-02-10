@@ -14,6 +14,7 @@ from handlerusers import HandlerUsers
 from session_name import SessionName
 from type import Api, UserInfo
 from user import User
+import cronaction
 
 
 class Bot:
@@ -117,6 +118,8 @@ It's need to bypass protect telegram
         emess = 'Well done'
         try:
             await self._users.checkin(chat_id)
+        except cronaction.FloodError as e:
+            emess = f'Flood detection! Wait {e.timeout}'
         except AuthKeyUnregisteredError as e:
             self.logger.error(str(e))
             emess = 'Your token is not registered'
