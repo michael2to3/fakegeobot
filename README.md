@@ -1,6 +1,7 @@
 ![Poster](https://github.com/michael2to3/fakegeo-polychessbot/blob/main/.readme/poster.png)
 # Telegram Fake Location Bot
 A Python-based Telegram bot that allows users to send fake location data to other bots.
+![Demo](https://github.com/michael2to3/fakegeo-polychessbot/blob/main/.readme/demo.mp4)
 
 ## Introduction
 This bot was created to help users bypass location checks in various applications, such as lessons. It works by sending fake location data from the user to another bot. 
