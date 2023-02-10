@@ -27,6 +27,11 @@ This bot was created to help users bypass location checks in various application
 python -m unittest discover -s ./test/
 ```
 
+## To-do
+- [ ] Switch to telethon for bot SDK
+- [ ] Remove duplicate functional
+- [ ] Disable from cron event too frequent handling
+
 ## Contribution
 Feel free to contribute to the project by submitting pull requests or opening issues for bug reports and feature requests.
 
