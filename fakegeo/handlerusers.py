@@ -125,7 +125,7 @@ class HandlerUsers:
         self._session.save(self._users[chat_id]._user)
 
     def restore(self):
-        users = self._session.load_all()
+        users = list(self._session.load_all())
 
         def generate_wrap(user):
             pass_cron = self._checkin.pass_cron()
@@ -134,15 +134,16 @@ class HandlerUsers:
 
         self._users = dict([(i._info._chat_id, generate_wrap(i))
                             for i in users if i._active])
+        self.logger.debug(f'Start restore session. Total users: {len(users)}')
         for user in users:
             if user._active:
                 chat_id = user._info._chat_id
+                sid = str(chat_id)
+                self.logger.debug('Acivate cron for user ' + sid)
                 user = self._users[chat_id]
 
-                user._cron = self._checkin.run(user)
+                user._cron = self._checkin.run(user._user)
                 self._users[chat_id] = user
-
-        return self
 
     def check_exist(self, chat_id: int):
         return chat_id in self._users
