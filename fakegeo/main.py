@@ -1,15 +1,12 @@
 from bot import Bot
+import multiprocessing
 import os
 from config import Config
 from type import Api
 import asyncio
-from threading import Thread
 import sys
 import logging
 from decouple import config
-import nest_asyncio
-
-nest_asyncio.apply()
 
 
 def setup_logging():
@@ -38,22 +35,23 @@ def start_bot():
     bot.run()
 
 
-def worker(ws, loop):
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(ws())
-
-
 def start_cron():
-    run = asyncio.get_event_loop().run_forever
-    loop = asyncio.new_event_loop()
-    thread = Thread(target=worker, args=(run, loop,))
-    thread.start()
+    try:
+        asyncio.get_event_loop().run_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        asyncio.get_event_loop().stop()
+        asyncio.get_event_loop().close()
 
 
-async def main():
+def main():
     setup_logging()
-    start_cron()
-    start_bot()
+    p1 = multiprocessing.Process(target=start_cron)
+    p2 = multiprocessing.Process(target=start_bot)
+    p1.start()
+    p2.start()
+
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    main()
