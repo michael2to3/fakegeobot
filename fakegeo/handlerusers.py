@@ -60,6 +60,7 @@ class HandlerUsers:
         user._cron = cron
 
         self._users[chat_id] = user
+        self.save(chat_id)
 
     async def checkin(self, chat_id: int):
         if self.check_exist(chat_id):
@@ -117,12 +118,12 @@ class HandlerUsers:
     def enable(self, chat_id: int):
         self._users[chat_id]._user._info._active = True
         self._users[chat_id]._cron.start()
-        self._session.save(self._users[chat_id]._user)
+        self.save(chat_id)
 
     def disable(self, chat_id: int):
         self._users[chat_id]._user._info._active = False
         self._users[chat_id]._cron.stop()
-        self._session.save(self._users[chat_id]._user)
+        self.save(chat_id)
 
     def restore(self):
         users = list(self._session.load_all())
