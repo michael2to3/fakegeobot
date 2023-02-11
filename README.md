@@ -47,6 +47,7 @@ python -m unittest discover -s ./test/
 - [ ] Switch to telethon for bot SDK
 - [ ] Remove duplicate functional
 - [ ] Disable from cron event too frequent handling
+- [ ] Send telegram after delete session
 
 ## Contribution
 Feel free to contribute to the project by submitting pull requests or opening issues for bug reports and feature requests.
