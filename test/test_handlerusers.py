@@ -145,10 +145,10 @@ class HandlerUsersTest(unittest.TestCase):
 
         handler.change_user(user)
         handler.enable(chat_id)
+        handler.change_user(user)
 
-        handler.enable(chat_id)
         load = handler.get_user(chat_id)
-        self.assertEqual(load._active, True)
+        self.assertEqual(load._info._active, True)
 
     def test_disable(self):
         username = 'username'
@@ -158,11 +158,11 @@ class HandlerUsersTest(unittest.TestCase):
         user = self.make_user(username, chat_id)
 
         handler.change_user(user)
-        handler.enable(chat_id)
+        handler.disable(chat_id)
+        handler.change_user(user)
 
-        handler.enable(chat_id)
         load = handler.get_user(chat_id)
-        self.assertEqual(load._active, True)
+        self.assertEqual(load._info._active, False)
 
     def test_restore(self):
         len = 10
