@@ -1,6 +1,6 @@
 # Telegram Fake Location Bot
 
-[![Python Version](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-blue)](https://www.python.org/downloads/)
 [![Telegram API](https://img.shields.io/badge/telegram%20API-v5.3-blue)](https://core.telegram.org/bots/api)
 [![Code Style](https://img.shields.io/badge/code%20style-pep8-orange)](https://www.python.org/dev/peps/pep-0008/)
 [![GitHub stars](https://img.shields.io/github/stars/michael2to3/fakegeo-polychessbot.svg)](https://github.com/michael2to3/fakegeo-polychessbot/stargazers)
