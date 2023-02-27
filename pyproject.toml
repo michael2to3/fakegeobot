@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "fakegeo-polychessbot"
+version = "0.0.1"
+description = "This bot was created to help users bypass location checks in various applications, such as lessons. It works by sending fake location data from the user to another bot."
+authors = ["Michael <michael2ga3@gmail.com>"]
+license = "GPL-3.0 license"
+readme = "README.md"
+packages = [{include = "fakegeo_polychessbot"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
