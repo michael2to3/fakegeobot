@@ -5,7 +5,7 @@
 [![Code Style](https://img.shields.io/badge/code%20style-pep8-orange)](https://www.python.org/dev/peps/pep-0008/)
 [![GitHub stars](https://img.shields.io/github/stars/michael2to3/fakegeo-polychessbot.svg)](https://github.com/michael2to3/fakegeo-polychessbot/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/michael2to3/fakegeo-polychessbot.svg)](https://github.com/michael2to3/fakegeo-polychessbot/network)
-[![codecov](https://codecov.io/gh/michael2to3/fakegeo-polychessbot/branch/master/graph/badge.svg)](https://codecov.io/gh/michael2to3/fakegeo-polychessbot)
+[![Codecov](https://img.shields.io/codecov/c/github/michael2to3/fakegeo-polychessbot)](https://codecov.io/gh/michael2to3/fakegeo-polychessbot)
 
 ![Poster](https://github.com/michael2to3/fakegeo-polychessbot/blob/main/.readme/poster.png)
 A Python-based Telegram bot that allows users to send fake location data to other bots.
