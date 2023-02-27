@@ -1,16 +1,23 @@
-from bot import Bot
+import asyncio
+import logging
 import multiprocessing
 import os
-from config import Config
-from type import Api
-import asyncio
 import sys
-import logging
+
+from bot import Bot
+from config import Config
 from decouple import config
+from type import Api
 
 
 def setup_logging():
-    if '--debug' in sys.argv or config('DEBUG') == 'true':
+    envDebug = 'false'
+    try:
+        envDebug = config('DEBUG')
+    except Exception:
+        envDebug = 'false'
+
+    if '--debug' in sys.argv or envDebug == 'true':
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.WARN)
