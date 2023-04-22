@@ -1,11 +1,7 @@
 # Telegram Fake Location Bot
 
-[![Python Version](https://img.shields.io/badge/python-blue)](https://www.python.org/downloads/)
-[![Telegram API](https://img.shields.io/badge/telegram%20API-v5.3-blue)](https://core.telegram.org/bots/api)
 [![Code Style](https://img.shields.io/badge/code%20style-pep8-orange)](https://www.python.org/dev/peps/pep-0008/)
-[![GitHub stars](https://img.shields.io/github/stars/michael2to3/fakegeo-polychessbot.svg)](https://github.com/michael2to3/fakegeo-polychessbot/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/michael2to3/fakegeo-polychessbot.svg)](https://github.com/michael2to3/fakegeo-polychessbot/network)
-[![Codecov](https://img.shields.io/codecov/c/github/michael2to3/fakegeo-polychessbot)](https://codecov.io/gh/michael2to3/fakegeo-polychessbot)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/b5916201dffd4ffeb04e52fd30172812)](https://app.codacy.com/gh/michael2to3/fakegeo-polychessbot/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 ![Poster](https://github.com/michael2to3/fakegeo-polychessbot/blob/main/.readme/poster.png)
 A Python-based Telegram bot that allows users to send fake location data to other bots.
