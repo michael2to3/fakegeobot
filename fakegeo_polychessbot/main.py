@@ -11,13 +11,13 @@ from type import Api
 
 
 def setup_logging():
-    envDebug = 'false'
+    envDebug = "false"
     try:
-        envDebug = config('DEBUG')
+        envDebug = config("DEBUG")
     except Exception:
-        envDebug = 'false'
+        envDebug = "false"
 
-    if '--debug' in sys.argv or envDebug == 'true':
+    if "--debug" in sys.argv or envDebug == "true":
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.WARN)
@@ -25,15 +25,14 @@ def setup_logging():
 
 def get_root_path():
     root = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(root, '..')
+    return os.path.join(root, "..")
 
 
 def generate_bot():
     root = get_root_path()
     cnf = Config()
     api = Api(cnf._api_id, cnf._api_hash)
-    bot = Bot(api, cnf._bot_token,  os.path.join(
-        root, cnf._db_path), 'user.db')
+    bot = Bot(api, cnf._bot_token, os.path.join(root, cnf._db_path), "user.db")
     return bot
 
 
@@ -60,5 +59,5 @@ def main():
     p2.start()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

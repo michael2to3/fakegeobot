@@ -67,7 +67,7 @@ class HandlerUsers:
             user = self._users[chat_id]._user
             await self._checkin.send_live_location(user)
         else:
-            raise ValueError('User not exist')
+            raise ValueError("User not exist")
 
     def change_user(self, user: User):
         chat_id = user._info._chat_id
@@ -81,7 +81,7 @@ class HandlerUsers:
 
     def save(self, chat_id: int):
         if chat_id not in self._users:
-            raise ValueError('User is not found')
+            raise ValueError("User is not found")
 
         user = self._users[chat_id]._user
         self._session.save(user)
@@ -133,14 +133,15 @@ class HandlerUsers:
             wrap = WrapperUser(user, pass_cron)
             return wrap
 
-        self._users = dict([(i._info._chat_id, generate_wrap(i))
-                            for i in users if i._active])
-        self.logger.debug(f'Start restore session. Total users: {len(users)}')
+        self._users = dict(
+            [(i._info._chat_id, generate_wrap(i)) for i in users if i._active]
+        )
+        self.logger.debug(f"Start restore session. Total users: {len(users)}")
         for user in users:
             if user._active:
                 chat_id = user._info._chat_id
                 sid = str(chat_id)
-                self.logger.debug('Acivate cron for user ' + sid)
+                self.logger.debug("Acivate cron for user " + sid)
                 user = self._users[chat_id]
 
                 user._cron = self._checkin.run(user._user)

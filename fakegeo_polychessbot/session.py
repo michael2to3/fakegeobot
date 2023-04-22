@@ -15,7 +15,7 @@ class Session:
     def __init__(self, path_db: str, name_db: str):
         self.logger = logging.getLogger(__name__)
         self._name_db = name_db
-        self._path_db = path_db + '/' + self._name_db
+        self._path_db = path_db + "/" + self._name_db
 
         self.create_table()
 
@@ -24,7 +24,8 @@ class Session:
 
     def create_table(self):
         con = self.connect()
-        con.cursor().execute('''
+        con.cursor().execute(
+            """
             CREATE TABLE IF NOT EXISTS users (
                 api_id TEXT,
                 api_hash TEXT,
@@ -37,7 +38,8 @@ class Session:
                 active BOOLEAN,
                 phone_code_hash TEXT
                 )
-        ''')
+        """
+        )
         con.commit()
         con.close()
         return self
@@ -47,7 +49,8 @@ class Session:
         info = user._info
         active = user._active
         con = self.connect()
-        con.cursor().execute('''
+        con.cursor().execute(
+            """
             INSERT INTO users (
                 api_id,
                 api_hash,
@@ -61,18 +64,20 @@ class Session:
                 phone_code_hash
  )
             VALUES (?,?,?,?,?,?,?,?,?,?)
-        ''', (
-            api._id,
-            api._hash,
-            info._session_name,
-            info._username,
-            str(info._chat_id),
-            info._phone,
-            info._auth_code,
-            info._schedule,
-            str(int(active)),
-            info._phone_code_hash
-        ))
+        """,
+            (
+                api._id,
+                api._hash,
+                info._session_name,
+                info._username,
+                str(info._chat_id),
+                info._phone,
+                info._auth_code,
+                info._schedule,
+                str(int(active)),
+                info._phone_code_hash,
+            ),
+        )
         con.commit()
         con.close()
         return self
@@ -82,7 +87,8 @@ class Session:
         info = user._info
         active = user._active
         con = self.connect()
-        con.cursor().execute('''
+        con.cursor().execute(
+            """
             UPDATE users SET
                 api_id=?,
                 api_hash=?,
@@ -94,18 +100,20 @@ class Session:
                 active=?,
                 phone_code_hash=?
             WHERE chat_id=?
-        ''', (
-            api._id,
-            api._hash,
-            info._session_name,
-            info._username,
-            info._phone,
-            info._auth_code,
-            info._schedule,
-            str(int(active)),
-            info._phone_code_hash,
-            str(info._chat_id),
-        ))
+        """,
+            (
+                api._id,
+                api._hash,
+                info._session_name,
+                info._username,
+                info._phone,
+                info._auth_code,
+                info._schedule,
+                str(int(active)),
+                info._phone_code_hash,
+                str(info._chat_id),
+            ),
+        )
         con.commit()
         con.close()
 
@@ -121,7 +129,7 @@ class Session:
 
     def delete(self, chat_id: int):
         sid = str(chat_id)
-        sql = 'DELETE FROM users WHERE chat_id=?'
+        sql = "DELETE FROM users WHERE chat_id=?"
         con = self.connect()
         con.cursor().execute(sql, (sid,))
         con.commit()
@@ -130,7 +138,7 @@ class Session:
     def load_all(self) -> Iterable[User]:
         con = self.connect()
         cursor = con.cursor()
-        cursor.execute('SELECT * FROM users')
+        cursor.execute("SELECT * FROM users")
         rows = cursor.fetchall()
         con.close()
         for row in rows:
@@ -140,7 +148,7 @@ class Session:
         id = str(chat_id)
         con = self.connect()
         cursor = con.cursor()
-        cursor.execute('SELECT * FROM users WHERE chat_id=?', (id,))
+        cursor.execute("SELECT * FROM users WHERE chat_id=?", (id,))
         row = cursor.fetchone()
         con.close()
 
@@ -150,7 +158,7 @@ class Session:
         id = str(chat_id)
         con = self.connect()
         cursor = con.cursor()
-        cursor.execute('SELECT * FROM users WHERE chat_id=?', (id,))
+        cursor.execute("SELECT * FROM users WHERE chat_id=?", (id,))
         row = cursor.fetchone()
         con.close()
 
@@ -158,18 +166,20 @@ class Session:
 
     def _generate(self, row) -> User:
         if row is None:
-            raise TypeError('Not found, row is None')
+            raise TypeError("Not found, row is None")
 
-        (api_id,
-         api_hash,
-         session_name,
-         username,
-         chat_id,
-         phone,
-         auth_code,
-         schedule,
-         active,
-         phone_code_hash) = row
+        (
+            api_id,
+            api_hash,
+            session_name,
+            username,
+            chat_id,
+            phone,
+            auth_code,
+            schedule,
+            active,
+            phone_code_hash,
+        ) = row
 
         user_info = UserInfo(
             session_name,
@@ -178,7 +188,7 @@ class Session:
             phone,
             auth_code,
             schedule,
-            phone_code_hash
+            phone_code_hash,
         )
         api = Api(api_id, api_hash)
         return User(api, user_info, active)

@@ -8,14 +8,15 @@ class UserInfo:
     _phone_code_hash: str
 
     def __init__(
-            self,
-            session_name: str,
-            username: str,
-            chat_id: int,
-            phone: str,
-            auth_code: int,
-            schedule: str,
-            phone_code_hash: str):
+        self,
+        session_name: str,
+        username: str,
+        chat_id: int,
+        phone: str,
+        auth_code: int,
+        schedule: str,
+        phone_code_hash: str,
+    ):
         self._session_name = session_name
         self._username = username
         self._chat_id = chat_id

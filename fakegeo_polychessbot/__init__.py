@@ -10,5 +10,15 @@ from user import User
 from handlerusers import HandlerUsers
 
 
-__all__ = ['type', 'Arg', 'Bot', 'CheckIn', 'Config',
-           'Geolocation', 'Session', 'SessionName', 'User', 'HandlerUsers']
+__all__ = [
+    "type",
+    "Arg",
+    "Bot",
+    "CheckIn",
+    "Config",
+    "Geolocation",
+    "Session",
+    "SessionName",
+    "User",
+    "HandlerUsers",
+]

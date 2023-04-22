@@ -1,4 +1,3 @@
-
 from datetime import datetime, timedelta
 from telethon.types import InputMediaGeoLive
 from proxytelegram import ProxyTelegram
@@ -35,7 +34,7 @@ class CronAction:
         if CronAction._has_overload_flood(user, timeout):
             delta = CronAction._get_diff(user, timeout).total_seconds()
             diff = timeout - int(delta / 60)
-            raise FloodError('Detect flood from location', diff)
+            raise FloodError("Detect flood from location", diff)
         user._timestamp_last_active = datetime.now()
         await CronAction._send_live_location(user, to_username)
 
@@ -53,6 +52,4 @@ class CronAction:
         # Well... Ignore error from library tg, it's ok
         # Still send InputMediaGeoLive
         stream: InputMediaGeoLive = geo.get()
-        await client.send_message(
-            to_username,
-            file=stream)
+        await client.send_message(to_username, file=stream)
