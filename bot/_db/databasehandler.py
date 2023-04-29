@@ -112,7 +112,8 @@ class DatabaseHandler:
             str(user_record.phone_code_hash),
         )
 
-        cron = Cron(cron_expression=user_record.cron_expression, callback=None, interval=600) # TODO remove default value
+        cron_expression = str(user_record.cron_expression)
+        cron = Cron(cron_expression=cron_expression, callback=lambda: print("cron in db handler"), interval=600) # TODO remove default value
 
         location_str = str(user_record.location)
         location = Geolocation.from_json(location_str)
