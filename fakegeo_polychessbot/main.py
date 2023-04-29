@@ -6,21 +6,13 @@ import sys
 
 from bot import Bot
 from config import Config
-from decouple import config
 from type import Api
 
 
 def setup_logging():
-    envDebug = "false"
-    try:
-        envDebug = config("DEBUG")
-    except Exception:
-        envDebug = "false"
-
-    if "--debug" in sys.argv or envDebug == "true":
-        logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.WARN)
+    env_debug = os.environ.get("DEBUG", "false").lower()
+    debug_flag = "--debug" in sys.argv or env_debug == "true"
+    logging.basicConfig(level=logging.DEBUG if debug_flag else logging.WARN)
 
 
 def get_root_path():
@@ -32,8 +24,7 @@ def generate_bot():
     root = get_root_path()
     cnf = Config()
     api = Api(cnf._api_id, cnf._api_hash)
-    bot = Bot(api, cnf._bot_token, os.path.join(root, cnf._db_path), "user.db")
-    return bot
+    return Bot(api, cnf._bot_token, os.path.join(root, cnf._db_path), "user.db")
 
 
 def start_bot():
@@ -53,10 +44,10 @@ def start_cron():
 
 def main():
     setup_logging()
-    p1 = multiprocessing.Process(target=start_cron)
-    p2 = multiprocessing.Process(target=start_bot)
-    p1.start()
-    p2.start()
+    cron_process = multiprocessing.Process(target=start_cron)
+    bot_process = multiprocessing.Process(target=start_bot)
+    cron_process.start()
+    bot_process.start()
 
 
 if __name__ == "__main__":

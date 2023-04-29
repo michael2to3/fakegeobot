@@ -1,7 +1,5 @@
 from typing import Dict
-
 from aiocron import Cron
-
 from arghelper import ArgHelper
 from checkin import CheckIn
 from proxytelegram import ProxyTelegram
@@ -37,7 +35,7 @@ class UserManager:
         for user in self._users.values():
             self._session.save(user._user)
 
-    def update_auth_code(self, chat_id: int, text: str):
+    def update_auth_code(self, chat_id: int, text: str) -> None:
         if self._session is None:
             return
 
@@ -45,14 +43,14 @@ class UserManager:
         self._users[chat_id]._user._info._auth_code = code
         self._session.save(self._users[chat_id]._user)
 
-    def update_phone_code_hash(self, chat_id: int, text: str):
+    def update_phone_code_hash(self, chat_id: int, text: str) -> None:
         self._users[chat_id]._user._info._phone_code_hash = text
 
-    def update_phone(self, chat_id: int, text: str):
+    def update_phone(self, chat_id: int, text: str) -> None:
         phone = self._parse.get_phone(text)
         self._users[chat_id]._user._info._phone = phone
 
-    def update_schedule(self, chat_id: int, text: str):
+    def update_schedule(self, chat_id: int, text: str) -> None:
         user_wrapper = self._users[chat_id]
         schedule = self._parse.get_cron(text)
         cron = user_wrapper._cron
@@ -65,14 +63,14 @@ class UserManager:
         self._users[chat_id] = user_wrapper
         self.save(chat_id)
 
-    async def perform_checkin(self, chat_id: int):
+    async def perform_checkin(self, chat_id: int) -> None:
         if self.check_exist(chat_id):
             user = self._users[chat_id]._user
             await self._checkin.send_live_location(user)
         else:
             raise ValueError("User not exist")
 
-    def update_user(self, user: User):
+    def update_user(self, user: User) -> None:
         chat_id = user._info._chat_id
 
         if self.check_exist(chat_id):
@@ -82,7 +80,7 @@ class UserManager:
             pass_cron = self._checkin.pass_cron()
             self._users[chat_id] = UserWrapper(user, pass_cron)
 
-    def save(self, chat_id: int):
+    def save(self, chat_id: int) -> None:
         if chat_id not in self._users:
             raise ValueError("User is not found")
 
@@ -98,11 +96,11 @@ class UserManager:
         phone_code_hash = req.phone_code_hash
         return phone_code_hash
 
-    def start_cron(self, chat_id: int):
+    def start_cron(self, chat_id: int) -> None:
         user = self._users[chat_id]._user
         self._users[chat_id]._cron = self._checkin.run(user)
 
-    async def delete(self, chat_id: int):
+    async def delete(self, chat_id: int) -> None:
         try:
             self.disable(chat_id)
         except Exception as e:
@@ -118,21 +116,21 @@ class UserManager:
         self._session.delete(chat_id)
         del self._users[chat_id]
 
-    def enable(self, chat_id: int):
+    def enable(self, chat_id: int) -> None:
         if self._users[chat_id]._user._info is None:
             raise ValueError("User is not found")
 
         self._users[chat_id]._cron.start()
         self.save(chat_id)
 
-    def disable(self, chat_id: int):
+    def disable(self, chat_id: int) -> None:
         self._users[chat_id]._cron.stop()
         self.save(chat_id)
 
-    def restore(self):
+    def restore(self) -> None:
         users = list(self._session.load_all())
 
-        def generate_wrap(user):
+        def generate_wrap(user: User) -> UserWrapper:
             pass_cron = self._checkin.pass_cron()
             wrap = UserWrapper(user, pass_cron)
             return wrap
@@ -151,8 +149,8 @@ class UserManager:
                 user_wrapper._cron = self._checkin.run(user_wrapper._user)
                 self._users[chat_id] = user_wrapper
 
-    def check_exist(self, chat_id: int):
+    def check_exist(self, chat_id: int) -> bool:
         return chat_id in self._users
 
-    def get_user(self, chat_id: int):
+    def get_user(self, chat_id: int) -> User:
         return self._users[chat_id]._user

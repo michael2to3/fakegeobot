@@ -6,7 +6,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from telethon.errors import AuthKeyUnregisteredError, FloodWaitError
 
-from handlerusers import HandlerUsers
+from usermanager import UserManager
 from session_name import SessionName
 from type import Api, UserInfo
 from user import User
@@ -17,7 +17,7 @@ class Bot:
     logger: logging.Logger
     _api: Api
     _app: Application
-    _users: HandlerUsers
+    _users: UserManager
     _path_db: str
 
     def __init__(self, api: Api, token: str, path_db: str, name_db: str):
@@ -25,46 +25,56 @@ class Bot:
         self._app = Application.builder().token(token).build()
         self._api = api
         self._path_db = path_db
-        self._users = HandlerUsers(path_db, name_db)
+        self._users = UserManager(path_db, name_db)
         self._users.restore()
 
     async def _start(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        if update.message is None:
+            return
+
         await update.message.reply_text(
             """
-Hi comrade.\n
-How to enable this future? Follow the steps:
-1) Press /auth {YOUR PHONE NUMBER}
-(for ex: /auth +79992132533)
-2) Then you need put /code {CODE}
-(fox ex: 28204, need put 2.8.2.0.4)
-3) if the schedule has changed, u can change the recurrence of sending messages
-/schedule {CRON LANG} (for ex: /schedule 30 18 * * 5)
-It's little hard, site can help you: https://cron.help/
-More info: https://github.com/michael2to3/fakegeo-polychessbot
+Hi there! 🤖\n
+To enable this feature, follow these steps:
+1) Authenticate by typing: /auth {YOUR_PHONE_NUMBER}
+   Example: /auth +79992132533
+2) Enter the code you receive as: /code {CODE}
+   Example: If the code is 28204, enter: /code 2.8.2.0.4
+3) To change the message sending schedule, type: /schedule {CRON_EXPRESSION}
+   Example: /schedule 30 18 * * 5
+   Need help with cron expressions? Visit: https://cron.help/
+For more information, check the GitHub repository:
+    https://github.com/michael2to3/fakegeo-polychessbot
 """
         )
 
     async def _help(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        if update.message is None:
+            return
+
         message = """
-/start - Start bot
-/help - Show this message
-/auth PHONE_NUMBER - Replace PHONE_NUMBER to your phone for auth in tg
-    ex: /auth +79992132533
-/code CODE - Replace CODE to your code after make auth
-    ex: /code 28204
-/schedule CRON - Replace CRON to your schedule to make repeat for your schedule
-    ex: /schedule 30 18 * * 5
-/send - Send now your fake geolocation
-    ex: /send
-/delete - Delete your token and all data about you
-    ex: /delete
-Service for help cron: https://cron.help/#30_18_*_*_5
+/start - Start the bot 🚀
+/help - Show this help message 📚
+/auth PHONE_NUMBER - Authenticate with your phone number 📱
+    Example: /auth +79992132533
+/code CODE - Enter the received code 🔢
+    Example: /code 2.8.2.0.4
+/schedule CRON - Set a message sending schedule with a cron expression ⏰
+    Example: /schedule 30 18 * * 5
+/send - Send your fake geolocation now 🌐
+    Example: /send
+/delete - Delete your token and all related data 🗑️
+    Example: /delete
+Cron help website: https://cron.help/#30_18_*_*_5
 More info: https://github.com/michael2to3/fakegeo-polychessbot
 Support: https://t.me/+EGnT6v3APokxMGYy
 """
         await update.message.reply_text(message)
 
     async def _auth(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        if update.message is None:
+            return
+
         chat_id = update.message.chat_id
 
         if self._users.check_exist(chat_id):
@@ -72,11 +82,16 @@ Support: https://t.me/+EGnT6v3APokxMGYy
             await update.message.reply_text(emess)
             return
 
-        username = update.message.from_user.full_name
+        username = "Not change"
+        if update.message.from_user is not None:
+            username = update.message.from_user.full_name
         sid = str(chat_id)
         session_name = self._path_db + SessionName().get_session_name_base(sid)
 
         text = update.message.text
+        if update.message.text is None:
+            await update.message.reply_text("Please enter your phone number")
+            return
 
         emess = """
 Send me auth code each char separated by a dot
@@ -90,10 +105,10 @@ It's need to bypass protect telegram
         user = User(self._api, info, True)
 
         try:
-            self._users.change_user(user)
-            self._users.change_phone(chat_id, text)
-            phone_code_hash = await self._users.require_code(chat_id)
-            self._users.change_phone_code_hash(chat_id, phone_code_hash)
+            self._users.update_user(user)
+            self._users.update_phone(chat_id, text)
+            phone_code_hash = await self._users.request_code(chat_id)
+            self._users.update_phone_code_hash(chat_id, phone_code_hash)
 
         except RuntimeError:
             emess = "Oops bad try access your account"
@@ -110,10 +125,13 @@ It's need to bypass protect telegram
             await update.message.reply_text(emess)
 
     async def _send_now(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        if update.message is None:
+            return
+
         chat_id = update.message.chat_id
         emess = "Well done"
         try:
-            await self._users.checkin(chat_id)
+            await self._users.perform_checkin(chat_id)
         except cronaction.FloodError as e:
             emess = f"Flood detection! Wait {e.timeout}"
         except AuthKeyUnregisteredError as e:
@@ -126,13 +144,23 @@ It's need to bypass protect telegram
             await update.message.reply_text(emess)
 
     async def _delete(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        if update.message is None:
+            return
+
         chat_id = update.message.chat_id
         await self._users.delete(chat_id)
         await update.message.reply_text("Your account was deleted!")
 
     async def _schedule(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        if update.message is None:
+            return
+
         id = update.message.chat_id
         text = update.message.text
+
+        if text is None:
+            await update.message.reply_text("Please enter your schedule")
+            return
 
         if text.find(" ") == -1:
             sch = f"Your schedule {self._users.get_user(id)._info._schedule}"
@@ -141,7 +169,7 @@ It's need to bypass protect telegram
 
         emess = "Done!"
         try:
-            self._users.change_schedule(id, text)
+            self._users.update_schedule(id, text)
         except CroniterNotAlphaError as e:
             self.logger.error(str(e))
             emess = "Error, schedule not change"
@@ -160,15 +188,21 @@ It's need to bypass protect telegram
         await update.message.reply_text(emess)
 
     async def _raw_code(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        if update.message is None:
+            return
+
         text = update.message.text
+        if text is None:
+            text = "Not change"
+
         chat_id = update.message.chat_id
         emess = "Success! Code complete!"
 
         users = self._users
         try:
-            users.change_auth_code(chat_id, text)
+            users.update_auth_code(chat_id, text)
             default_sch = "30 18 * * 6"
-            users.change_schedule(chat_id, default_sch)
+            users.update_schedule(chat_id, default_sch)
         except ValueError:
             emess = "Bad value of command"
         except KeyError:
@@ -177,6 +211,9 @@ It's need to bypass protect telegram
         await update.message.reply_text(emess)
 
     async def _disable(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        if update.message is None:
+            return
+
         chat_id = update.message.chat_id
         emess = "Your account is disable"
         try:
@@ -187,6 +224,9 @@ It's need to bypass protect telegram
         await update.message.reply_text(emess)
 
     async def _enable(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        if update.message is None:
+            return
+
         chat_id = update.message.chat_id
         emess = "Your account is enable"
         try:
@@ -212,5 +252,4 @@ It's need to bypass protect telegram
 
         for name, func in commands:
             app.add_handler(CommandHandler(name, func))
-
         app.run_polling()
