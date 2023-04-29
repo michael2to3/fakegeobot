@@ -3,7 +3,7 @@ from croniter.croniter import CroniterBadCronError, CroniterNotAlphaError
 
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
-
+from typing import Dict
 from _db import DatabaseHandler
 from _commands import Start, Help, Auth, Code, Schedule, Send, Delete, Disable, Enable
 from _type import ApiApp, User
@@ -13,7 +13,7 @@ class Bot:
     logger: logging.Logger
     _api: ApiApp
     _app: Application
-    _users: list[User]
+    _users: Dict[int, User]
     _db: DatabaseHandler
 
     def __init__(self, api: ApiApp, token: str, db: DatabaseHandler):
@@ -21,7 +21,8 @@ class Bot:
         self._app = Application.builder().token(token).build()
         self._api = api
         self._db = db
-        self._users = list(db.load_all_users())
+        users = list(db.load_all_users())
+        self._users = {user.chat_id: user for user in users}
 
     async def _handle_command(
         self, command: str, update: Update, context: ContextTypes.DEFAULT_TYPE
