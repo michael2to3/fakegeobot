@@ -4,19 +4,40 @@ from type import UserInfo
 
 
 class User:
-    _api: Api
-    _info: UserInfo
-    _active: bool
-    _timestamp_last_active: datetime
-
     def __init__(self, api: Api, info: UserInfo, active: bool):
-        self._api = api
-        self._info = info
-        self._active = active
-        self._timestamp_last_active = datetime(1, 1, 1, 0, 0)
+        self.api = api
+        self.info = info
+        self.active = active
+        self.timestamp_last_active = datetime(1, 1, 1, 0, 0)
 
-    def __getattr__(self, name: str):
-        return self.__dict__[name]
+    @property
+    def api(self) -> Api:
+        return self._api
 
-    def __setattr__(self, name: str, value):
-        self.__dict__[name] = value
+    @api.setter
+    def api(self, value: Api):
+        self._api = value
+
+    @property
+    def info(self) -> UserInfo:
+        return self._info
+
+    @info.setter
+    def info(self, value: UserInfo):
+        self._info = value
+
+    @property
+    def active(self) -> bool:
+        return self._active
+
+    @active.setter
+    def active(self, value: bool):
+        self._active = value
+
+    @property
+    def timestamp_last_active(self) -> datetime:
+        return self._timestamp_last_active
+
+    @timestamp_last_active.setter
+    def timestamp_last_active(self, value: datetime):
+        self._timestamp_last_active = value

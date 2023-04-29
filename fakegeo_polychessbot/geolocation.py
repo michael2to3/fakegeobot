@@ -20,6 +20,5 @@ class Geolocation:
 
     def get(self):
         return InputMediaGeoLive(
-            InputGeoPoint(self._lat, self._long),
-            period=self._timeout
+            InputGeoPoint(self._lat, self._long), period=self._timeout
         )

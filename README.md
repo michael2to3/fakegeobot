@@ -1,11 +1,8 @@
 # Telegram Fake Location Bot
 
-[![Python Version](https://img.shields.io/badge/python-blue)](https://www.python.org/downloads/)
-[![Telegram API](https://img.shields.io/badge/telegram%20API-v5.3-blue)](https://core.telegram.org/bots/api)
-[![Code Style](https://img.shields.io/badge/code%20style-pep8-orange)](https://www.python.org/dev/peps/pep-0008/)
-[![GitHub stars](https://img.shields.io/github/stars/michael2to3/fakegeo-polychessbot.svg)](https://github.com/michael2to3/fakegeo-polychessbot/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/michael2to3/fakegeo-polychessbot.svg)](https://github.com/michael2to3/fakegeo-polychessbot/network)
-[![Codecov](https://img.shields.io/codecov/c/github/michael2to3/fakegeo-polychessbot)](https://codecov.io/gh/michael2to3/fakegeo-polychessbot)
+[![Code Style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/michael2to3/fakegeo-polychessbot)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/b5916201dffd4ffeb04e52fd30172812)](https://app.codacy.com/gh/michael2to3/fakegeo-polychessbot/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/b5916201dffd4ffeb04e52fd30172812)](https://app.codacy.com/gh/michael2to3/fakegeo-polychessbot/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 
 ![Poster](https://github.com/michael2to3/fakegeo-polychessbot/blob/main/.readme/poster.png)
 A Python-based Telegram bot that allows users to send fake location data to other bots.
@@ -13,15 +10,9 @@ A Python-based Telegram bot that allows users to send fake location data to othe
 https://user-images.githubusercontent.com/87614587/218004599-2d3e04d4-e8f4-42bd-83d0-cd6e30af56b9.mp4
 
 ## Introduction
-This bot was created to help users bypass location checks in various applications, such as lessons. It works by sending fake location data from the user to another bot. 
+This bot was created to help users bypass location checks in various applications, such as lessons. It works by sending fake location data from the user to another bot.
 
-## Requirements
-- Python 3.x
-- [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)
-- [aiocron](https://github.com/gawel/aiocron)
-- [python-decouple](https://github.com/HBNetwork/python-decouple)
-- [Telethon](https://github.com/LonamiWebs/Telethon)
-
+*⚠️ Warning*: By creating an authentication session, you are granting this bot full access to your Telegram account. This includes the ability to read your messages, send messages on your behalf, and manage your account. Please ensure you trust the bot and its developers before proceeding. If you have any concerns, please review the bot's source code or contact the developers directly.
 
 ## Telegram API
 - You need to create an API client to use this script. You can do it by following these steps:
@@ -47,18 +38,12 @@ This bot was created to help users bypass location checks in various application
 
 ## Start unit test
 
-```sh
+```bash
 python -m unittest discover -s ./test/
 ```
-
-## To-do
-- [ ] Switch to telethon for bot SDK
-- [ ] Remove duplicate functional
-- [ ] Disable from cron event too frequent handling
-- [ ] Send telegram after delete session
 
 ## Contribution
 Feel free to contribute to the project by submitting pull requests or opening issues for bug reports and feature requests.
 
 ## License
-This project is licensed under the GNU License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU License. See the [LICENSE](https://github.com/michael2to3/fakegeo-polychessbot/blob/main/.readme/LICENSE) file for more information.
