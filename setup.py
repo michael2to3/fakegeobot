@@ -5,7 +5,7 @@ from pip._internal.network.session import PipSession
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-install_reqs = parse_requirements('requirements.txt', session=PipSession())
+install_reqs = parse_requirements("requirements.txt", session=PipSession())
 reqs = [str(ir.requirement) for ir in install_reqs]
 
 setup(
@@ -24,5 +24,5 @@ setup(
         "License :: OSI Approved :: GPL-3.0",
         "Operating System :: OS Independent",
     ],
-    install_requires=reqs
+    install_requires=reqs,
 )
