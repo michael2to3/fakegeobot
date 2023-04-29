@@ -1,6 +1,6 @@
 # Telegram Fake Location Bot
 
-[![Code Style](https://img.shields.io/badge/code%20style-pep8-orange)](https://www.python.org/dev/peps/pep-0008/)
+[![Code Style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/michael2to3/fakegeo-polychessbot)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/b5916201dffd4ffeb04e52fd30172812)](https://app.codacy.com/gh/michael2to3/fakegeo-polychessbot/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 ![Poster](https://github.com/michael2to3/fakegeo-polychessbot/blob/main/.readme/poster.png)
