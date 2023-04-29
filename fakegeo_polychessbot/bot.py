@@ -133,7 +133,12 @@ It's need to bypass protect telegram
 
     async def _delete(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
-        await self._users.delete(chat_id)
+        try:
+            await self._users.delete(chat_id)
+        except KeyError as e:
+            self.logger.error(str(e))
+            await update.message.reply_text("Your token is not registered")
+            return
         await update.message.reply_text("Your account was deleted!")
 
     async def _schedule(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
@@ -216,6 +221,8 @@ It's need to bypass protect telegram
             self.logger.error(f"Message is None in command: {command}")
             return
 
+        command = update.message.text.split(" ")[0].lstrip("/")
+
         handlers = {
             "start": self._start,
             "help": self._help,
@@ -230,7 +237,19 @@ It's need to bypass protect telegram
 
         handler = handlers.get(command)
         if handler:
-            await handler(update, context)
+            try:
+                await handler(update, context)
+            except Exception as e:
+                self.logger.error(
+                    f"Error while handling the command: {command}, {e}")
+                await update.message.reply_text(
+                    f"Oops! An error occurred while handling the command: {command}."
+                )
+        else:
+            self.logger.warn(f"Unknown command: {command}")
+            await update.message.reply_text(
+                f"Unknown command: {command}"
+            )
 
     def run(self) -> None:
         app = self._app
