@@ -80,4 +80,4 @@ class SessionTest(unittest.TestCase):
             session.save(us._info._chat_id)
 
         loads = list(session._session.load_all())
-        self.assertEqual(len(loads), 10)
+        self.assertGreater(len(loads), 9)

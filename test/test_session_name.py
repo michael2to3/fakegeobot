@@ -12,7 +12,7 @@ class SessionNameTest(unittest.TestCase):
         rhs = self._name.get_session_name()
         self.assertNotEqual(lhs, rhs)
 
-    def test_check_md5(self):
+    def test_check_hash(self):
         base = self._name.get_session_name()
         lhs = self._name.get_session_name_base(base)
         rhs = self._name.get_session_name_base(base)
