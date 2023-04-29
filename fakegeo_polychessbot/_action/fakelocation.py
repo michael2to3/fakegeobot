@@ -16,10 +16,6 @@ class Fakelocation(Action):
         self._api = api
         self._user = user
 
-    def get_client(self, user: User) -> TelegramClient:
-        session_name = user.session.session_name
-        return TelegramClient(session_name, self._api.id, self._api.hash)
-
     async def execute(self):
         client = TelegramClient(
             self._user.session.session_name, self._api.id, self._api.hash
