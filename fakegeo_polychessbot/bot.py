@@ -29,9 +29,6 @@ class Bot:
         self._users.restore()
 
     async def _start(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        if update.message is None:
-            return
-
         await update.message.reply_text(
             """
 Hi there! 🤖\n
@@ -49,9 +46,6 @@ For more information, check the GitHub repository:
         )
 
     async def _help(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        if update.message is None:
-            return
-
         message = """
 /start - Start the bot 🚀
 /help - Show this help message 📚
@@ -72,9 +66,6 @@ Support: https://t.me/+EGnT6v3APokxMGYy
         await update.message.reply_text(message)
 
     async def _auth(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        if update.message is None:
-            return
-
         chat_id = update.message.chat_id
 
         if self._users.check_exist(chat_id):
@@ -125,9 +116,6 @@ It's need to bypass protect telegram
             await update.message.reply_text(emess)
 
     async def _send_now(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        if update.message is None:
-            return
-
         chat_id = update.message.chat_id
         emess = "Well done"
         try:
@@ -144,17 +132,11 @@ It's need to bypass protect telegram
             await update.message.reply_text(emess)
 
     async def _delete(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        if update.message is None:
-            return
-
         chat_id = update.message.chat_id
         await self._users.delete(chat_id)
         await update.message.reply_text("Your account was deleted!")
 
     async def _schedule(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        if update.message is None:
-            return
-
         id = update.message.chat_id
         text = update.message.text
 
@@ -188,9 +170,6 @@ It's need to bypass protect telegram
         await update.message.reply_text(emess)
 
     async def _raw_code(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        if update.message is None:
-            return
-
         text = update.message.text
         if text is None:
             text = "Not change"
@@ -211,9 +190,6 @@ It's need to bypass protect telegram
         await update.message.reply_text(emess)
 
     async def _disable(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        if update.message is None:
-            return
-
         chat_id = update.message.chat_id
         emess = "Your account is disable"
         try:
@@ -224,9 +200,6 @@ It's need to bypass protect telegram
         await update.message.reply_text(emess)
 
     async def _enable(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        if update.message is None:
-            return
-
         chat_id = update.message.chat_id
         emess = "Your account is enable"
         try:
@@ -236,20 +209,47 @@ It's need to bypass protect telegram
 
         await update.message.reply_text(emess)
 
+    async def _handle_command(
+        self, command: str, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ):
+        if update.message is None:
+            self.logger.error(f"Message is None in command: {command}")
+            return
+
+        handlers = {
+            "start": self._start,
+            "help": self._help,
+            "auth": self._auth,
+            "code": self._raw_code,
+            "schedule": self._schedule,
+            "send": self._send_now,
+            "disable": self._disable,
+            "enable": self._enable,
+            "delete": self._delete,
+        }
+
+        handler = handlers.get(command)
+        if handler:
+            await handler(update, context)
+
     def run(self) -> None:
         app = self._app
         commands = [
-            ("start", self._start),
-            ("help", self._help),
-            ("auth", self._auth),
-            ("code", self._raw_code),
-            ("schedule", self._schedule),
-            ("send", self._send_now),
-            ("disable", self._disable),
-            ("enable", self._enable),
-            ("delete", self._delete),
+            "start",
+            "help",
+            "auth",
+            "code",
+            "schedule",
+            "send",
+            "disable",
+            "enable",
+            "delete",
         ]
 
-        for name, func in commands:
-            app.add_handler(CommandHandler(name, func))
+        for command in commands:
+            app.add_handler(
+                CommandHandler(
+                    command, lambda u, c: self._handle_command(command, u, c)
+                )
+            )
         app.run_polling()
