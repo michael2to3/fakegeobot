@@ -1,4 +1,4 @@
-class UserInfo:
+class Session:
     def __init__(
         self,
         session_name: str,

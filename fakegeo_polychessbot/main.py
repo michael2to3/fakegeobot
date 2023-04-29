@@ -5,8 +5,8 @@ import os
 import sys
 
 from bot import Bot
-from config import Config
-from type import Api
+from _config import Config
+from _type import ApiApp
 
 
 def setup_logging():
@@ -23,7 +23,7 @@ def get_root_path():
 def generate_bot():
     root = get_root_path()
     cnf = Config()
-    api = Api(cnf._api_id, cnf._api_hash)
+    api = ApiApp(cnf._api_id, cnf._api_hash)
     return Bot(api, cnf._bot_token, os.path.join(root, cnf._db_path), "user.db")
 
 
