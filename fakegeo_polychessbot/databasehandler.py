@@ -64,8 +64,7 @@ class DatabaseHandler:
     def delete(self, chat_id: int):
         db_session = self._get_session()
         user_record = (
-            db_session.query(UserRecord).filter(
-                UserRecord.chat_id == chat_id).first()
+            db_session.query(UserRecord).filter(UserRecord.chat_id == chat_id).first()
         )
         if user_record:
             db_session.delete(user_record)
@@ -82,8 +81,7 @@ class DatabaseHandler:
     def load(self, chat_id: int) -> User:
         db_session = self._get_session()
         user_record = (
-            db_session.query(UserRecord).filter(
-                UserRecord.chat_id == chat_id).first()
+            db_session.query(UserRecord).filter(UserRecord.chat_id == chat_id).first()
         )
         if user_record:
             return self._generate(user_record)
@@ -93,8 +91,7 @@ class DatabaseHandler:
     def check_exist(self, chat_id: int) -> bool:
         db_session = self._get_session()
         user_record = (
-            db_session.query(UserRecord).filter(
-                UserRecord.chat_id == chat_id).first()
+            db_session.query(UserRecord).filter(UserRecord.chat_id == chat_id).first()
         )
         return user_record is not None
 
@@ -114,7 +111,6 @@ class DatabaseHandler:
 
     def _get_session(self):
         if self.SessionLocal is None:
-            logging.getLogger(__name__).error(
-                "DatabaseHandler is not initialized")
+            logging.getLogger(__name__).error("DatabaseHandler is not initialized")
             raise ValueError("DatabaseHandler is not initialized")
         return self.SessionLocal()
