@@ -1,11 +1,9 @@
+import os
+import unittest
 from random import randint
 from rootpath import fakegeo
-import time
-import unittest
-import os
 
-Session = fakegeo.Session
-SessionName = fakegeo.SessionName
+Session = fakegeo.UserManager
 User = fakegeo.User
 UserInfo = fakegeo.type.UserInfo
 Api = fakegeo.type.Api
@@ -18,11 +16,11 @@ class SessionTest(unittest.TestCase):
     _path_db = "./db/"
 
     def create_session(self):
-        name = SessionName().get_session_name()
-        return Session(self._path_db, name)
+        name_db = "test.db"
+        return Session(self._path_db, name_db)
 
     def make_user(self, username: str, chat_id: int) -> User:
-        session_name = SessionName().get_session_name()
+        session_name = "test_session"
         info = UserInfo(
             session_name=session_name,
             username=username,
@@ -40,9 +38,10 @@ class SessionTest(unittest.TestCase):
         chat_id = 123456
         user = self.make_user(username, chat_id)
         session = self.create_session()
-        session.save(user)
+        session.update_user(user)
+        session.save(chat_id)
 
-        load = session.load(chat_id)
+        load = session.get_user(chat_id)
         self.assertIsNotNone(load, "User not found")
         self.assertEqual(load._info._username, username)
 
@@ -52,17 +51,17 @@ class SessionTest(unittest.TestCase):
         chat_id = 1928159074
         user = self.make_user(username, chat_id)
         session = self.create_session()
-        session.save(user)
+        session.update_user(user)
+        session.save(chat_id)
 
         user._info._username = new_username
-        session.save(user)
+        session.update_user(user)
+        session.save(chat_id)
 
-        del user
-
-        load = session.load(chat_id)
+        load = session.get_user(chat_id)
         self.assertEqual(load._info._username, new_username)
 
-    def save_load_all_users(self):
+    def test_save_load_all_users(self):
         username = "first"
         chat_id = 1928159074
         user = self.make_user(username, chat_id)
@@ -75,9 +74,10 @@ class SessionTest(unittest.TestCase):
 
         other_users = [get_new_user(user) for _ in range(10)]
         session = self.create_session()
-        session.save(user)
+        session.update_user(user)
         for us in other_users:
-            session.save(us)
+            session.update_user(us)
+            session.save(us._info._chat_id)
 
-        loads = list(session.load_all())
+        loads = list(session._session.load_all())
         self.assertGreater(len(loads), 10)

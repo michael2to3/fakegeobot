@@ -1,7 +1,7 @@
 import unittest
 from rootpath import fakegeo
 
-Arg = fakegeo.Arg
+Arg = fakegeo.ArgHelper
 
 
 class ArgTest(unittest.TestCase):
