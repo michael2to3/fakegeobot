@@ -1,4 +1,4 @@
-from _user import Normalizer
+from _normalizer import Normalizer
 
 
 class AuthCode(Normalizer):

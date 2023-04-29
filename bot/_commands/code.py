@@ -5,18 +5,16 @@ from _commands import Command
 
 class Code(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        text = update.message.text
-        if text is None:
-            text = "Not change"
+        auth_code = update.message.text
+        if auth_code is None:
+            await update.message.reply_text("Bad value of command")
+            return
 
         chat_id = update.message.chat_id
         emess = "Success! Code complete!"
 
-        users = self.bot._users
         try:
-            users.update_auth_code(chat_id, text)
-            default_sch = "30 18 * * 6"
-            users.update_schedule(chat_id, default_sch)
+            self.bot._users[chat_id].session.auth_code = int(auth_code)
         except ValueError:
             emess = "Bad value of command"
         except KeyError:

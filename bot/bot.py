@@ -6,7 +6,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 from typing import Dict
 from _db import DatabaseHandler
 from _commands import Start, Help, Auth, Code, Schedule, Send, Delete, Disable, Enable
-from _type import ApiApp, User
+from model import ApiApp, User
 
 
 class Bot:
@@ -22,7 +22,7 @@ class Bot:
         self._api = api
         self._db = db
         users = list(db.load_all_users())
-        self._users = {user.chat_id: user for user in users}
+        self._users = {user.session.chat_id: user for user in users}
 
     async def _handle_command(
         self, command: str, update: Update, context: ContextTypes.DEFAULT_TYPE

@@ -1,19 +1,19 @@
 import aiocron
+from typing import Callable
 
 
 class FloodException(BaseException):
     message: str
-    timeout: int
 
     def __init__(self, message: str):
         self.message = message
 
 
 class Cron:
-    def __init__(self, callback, cron_expression, timeout=600):
+    def __init__(self, callback: Callable[[], None], cron_expression: str, interval: int):
         self.callback = callback
         self.cron_expression = cron_expression
-        self.timeout = timeout
+        self.interval = interval
         self.validate_cron_expression()
         self.job = None
 
@@ -38,7 +38,7 @@ class Cron:
                 min_values = list(range(0, 60, min_step))
 
             if any(
-                t2 - t1 < self.timeout / 60
+                t2 - t1 < self.interval / 60
                 for t1, t2 in zip(min_values, min_values[1:])
             ):
                 raise FloodException("Cron schedule is too frequent")

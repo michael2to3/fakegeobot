@@ -6,7 +6,7 @@ import sys
 
 from bot import Bot
 from _config import Config
-from _type import ApiApp
+from model import ApiApp
 
 
 def setup_logging():

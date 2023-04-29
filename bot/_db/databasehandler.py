@@ -5,8 +5,7 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from _user import User, Session
-from _type import Geolocation
+from model import User, Session, Geolocation
 from _cron import Cron
 
 Base = declarative_base()
@@ -113,7 +112,7 @@ class DatabaseHandler:
             str(user_record.phone_code_hash),
         )
 
-        cron = Cron(cron_expression=user_record.cron_expression, callback=None)
+        cron = Cron(cron_expression=user_record.cron_expression, callback=None, interval=600) # TODO remove default value
 
         location_str = str(user_record.location)
         location = Geolocation.from_json(location_str)

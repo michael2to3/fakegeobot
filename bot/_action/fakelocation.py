@@ -1,9 +1,9 @@
 import logging
 from telethon import TelegramClient
 from telethon.types import InputMediaGeoLive
-from _type import User
+from model import User
 from _action import Action
-from _type import ApiApp
+from model import ApiApp
 
 
 class Fakelocation(Action):

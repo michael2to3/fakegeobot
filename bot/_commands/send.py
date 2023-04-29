@@ -2,7 +2,6 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telethon.errors import AuthKeyUnregisteredError
 from _commands import Command
-from _type import Session, User
 from _action import Fakelocation
 
 

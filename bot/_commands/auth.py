@@ -1,7 +1,11 @@
 from telegram import Update
 from telegram.ext import ContextTypes
+from telethon.errors import FloodWaitError
+from sqlite3 import OperationalError
 from _commands import Command
-from _type import Session, User
+from model import Session, User, Geolocation
+from _user import RequestCode
+from _cron import Cron
 
 
 class Auth(Command):
@@ -18,8 +22,8 @@ class Auth(Command):
             username = update.message.from_user.full_name
         session_name = str(chat_id)
 
-        text = update.message.text
-        if update.message.text is None:
+        phone = update.message.text
+        if phone is None:
             await update.message.reply_text("Please enter your phone number")
             return
 
@@ -32,13 +36,24 @@ It's need to bypass protect telegram
 *⚠️ Warning*: By creating an authentication session, you are granting this bot full access to your Telegram account. This includes the ability to read your messages, send messages on your behalf, and manage your account. Please ensure you trust the bot and its developers before proceeding. If you have any concerns, please review the bot's source code or contact the developers directly.
 """
 
+        # @TODO remove default value
         schedule = "30 18 * * 6"
-        info = Session(session_name, username, chat_id, "", -1, schedule, "")
-        user = User(self._api, info, True)
+        timeout = 600
+        geo = Geolocation(0, 0, 1)
+        info = Session(
+            session_name=session_name,
+            username=username,
+            chat_id=chat_id,
+            phone=phone,
+            auth_code=-1,
+            schedule=schedule,
+            phone_code_hash="",
+        )
+        cron = Cron(lambda: None, schedule, timeout)
+        user = User(cron, geo, info, "@me")
 
         try:
-            phone_code_hash = await RequestCode.get(user, self._api)
-            user.session.phone_code_hash = phone_code_hash
+            user.session.phone_code_hash = await RequestCode.get(user, self.bot._api)
         except RuntimeError:
             emess = "Oops bad try access your account"
         except ValueError:
@@ -46,9 +61,9 @@ It's need to bypass protect telegram
         except FloodWaitError as e:
             emess = f"Oops flood exception! Wait: {e.seconds} seconds"
         except OperationalError as e:
-            self.logger.error(str(e))
+            self.bot.logger.error(str(e))
             emess = "Oops database is fire!"
         else:
-            self._db.save_user(user)
+            self.bot._db.save_user(user)
         finally:
             await update.message.reply_text(emess)
