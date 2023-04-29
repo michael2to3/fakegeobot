@@ -11,6 +11,7 @@ https://user-images.githubusercontent.com/87614587/218004599-2d3e04d4-e8f4-42bd-
 
 ## Introduction
 This bot was created to help users bypass location checks in various applications, such as lessons. It works by sending fake location data from the user to another bot.
+
 *⚠️ Warning*: By creating an authentication session, you are granting this bot full access to your Telegram account. This includes the ability to read your messages, send messages on your behalf, and manage your account. Please ensure you trust the bot and its developers before proceeding. If you have any concerns, please review the bot's source code or contact the developers directly.
 
 ## Telegram API
