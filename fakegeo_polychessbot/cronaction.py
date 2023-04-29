@@ -52,8 +52,10 @@ class TelegramClient:
     async def sign_in(self):
         phone_number = self.user._info._phone
         auth_code = self.user._info._auth_code
-        hash = self.user._info._phone_code_hash
-        await self.client.sign_in(phone_number, auth_code, phone_code_hash=hash)
+        phonr_code_hash = self.user._info._phone_code_hash
+        await self.client.sign_in(
+            phone_number, auth_code, phone_code_hash=phonr_code_hash
+        )
 
     async def send_live_location(self, to_username: str) -> None:
         await self.connect()
