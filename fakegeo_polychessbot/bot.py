@@ -240,16 +240,13 @@ It's need to bypass protect telegram
             try:
                 await handler(update, context)
             except Exception as e:
-                self.logger.error(
-                    f"Error while handling the command: {command}, {e}")
+                self.logger.error(f"Error while handling the command: {command}, {e}")
                 await update.message.reply_text(
                     f"Oops! An error occurred while handling the command: {command}."
                 )
         else:
             self.logger.warn(f"Unknown command: {command}")
-            await update.message.reply_text(
-                f"Unknown command: {command}"
-            )
+            await update.message.reply_text(f"Unknown command: {command}")
 
     def run(self) -> None:
         app = self._app
