@@ -1,7 +1,7 @@
 import logging
 
 
-class Arg:
+class ArgHelper:
     logger: logging.Logger
 
     def __init__(self):
