@@ -13,4 +13,4 @@ class Info(Command):
             return
 
         user = self.bot.users[chat_id]
-        await update.message.reply_text(f"User: {user}\n")
+        await update.message.reply_text(f"User: {user}")
