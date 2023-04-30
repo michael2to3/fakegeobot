@@ -1,6 +1,6 @@
 from _cron import Cron
-from model import Session
-from model import Geolocation
+from model.session import Session
+from model.geolocation import Geolocation
 
 
 class User:
@@ -8,10 +8,10 @@ class User:
 
     def __init__(
         self,
-        cron: Cron,
-        location: Geolocation,
+        cron: Cron | None,
+        location: Geolocation | None,
         session: Session,
-        recipient: str,
+        recipient: str | None,
     ):
         self._cron = cron
         self._location = location

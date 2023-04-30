@@ -4,17 +4,15 @@ class Session:
         session_name: str,
         username: str,
         chat_id: int,
-        phone: str,
-        auth_code: int,
-        schedule: str,
-        phone_code_hash: str,
+        phone: str | None,
+        auth_code: int | None,
+        phone_code_hash: str | None,
     ):
         self.session_name = session_name
         self.username = username
         self.chat_id = chat_id
         self.phone = phone
         self.auth_code = auth_code
-        self.schedule = schedule
         self.phone_code_hash = phone_code_hash
 
     @property
@@ -42,33 +40,25 @@ class Session:
         self._chat_id = value
 
     @property
-    def phone(self) -> str:
+    def phone(self) -> str | None:
         return self._phone
 
     @phone.setter
-    def phone(self, value: str):
+    def phone(self, value: str | None):
         self._phone = value
 
     @property
-    def auth_code(self) -> int:
+    def auth_code(self) -> int | None:
         return self._auth_code
 
     @auth_code.setter
-    def auth_code(self, value: int):
+    def auth_code(self, value: int | None):
         self._auth_code = value
 
     @property
-    def schedule(self) -> str:
-        return self._schedule
-
-    @schedule.setter
-    def schedule(self, value: str):
-        self._schedule = value
-
-    @property
-    def phone_code_hash(self) -> str:
+    def phone_code_hash(self) -> str | None:
         return self._phone_code_hash
 
     @phone_code_hash.setter
-    def phone_code_hash(self, value: str):
+    def phone_code_hash(self, value: str | None):
         self._phone_code_hash = value

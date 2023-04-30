@@ -15,15 +15,14 @@ class UserRecord(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    cron_expression = Column(String)
-    location = Column(String)
+    cron_expression = Column(String, nullable=True)
+    location = Column(String, nullable=True)
     session_name = Column(String)
     username = Column(String)
     chat_id = Column(Integer)
     phone = Column(String)
     auth_code = Column(Integer)
-    schedule = Column(String)
-    recipient = Column(String)
+    recipient = Column(String, nullable=True)
     phone_code_hash = Column(String)
 
 
@@ -47,14 +46,15 @@ class DatabaseHandler:
     def save_user(self, user: User):
         db_session = self._get_session()
         user_record = UserRecord(
-            cron_expression=user.cron.cron_expression,
-            location=user.location.to_json(),
+            cron_expression=(
+                user.cron.cron_expression if user.cron is not None else None
+            ),
+            location=(user.location.to_json() if user.location is not None else None),
             session_name=user.session.session_name,
             username=user.session.username,
             chat_id=user.session.chat_id,
             phone=user.session.phone,
             auth_code=user.session.auth_code,
-            schedule=user.session.schedule,
             recipient=user.recipient,
             phone_code_hash=user.session.phone_code_hash,
         )
@@ -99,7 +99,7 @@ class DatabaseHandler:
         chat_id = cast(Optional[int], user_record.chat_id)
         auth_code = cast(Optional[int], user_record.auth_code)
 
-        if chat_id is None or auth_code is None:
+        if chat_id is None:
             raise ValueError("User not found")
 
         session = Session(
@@ -108,12 +108,18 @@ class DatabaseHandler:
             chat_id,
             str(user_record.phone),
             auth_code,
-            str(user_record.schedule),
             str(user_record.phone_code_hash),
         )
 
-        cron_expression = str(user_record.cron_expression)
-        cron = Cron(cron_expression=cron_expression, callback=lambda: print("cron in db handler"), interval=600) # TODO remove default value
+        cron_expression = user_record.cron_expression
+        if cron_expression is not None:
+            cron = Cron(
+                cron_expression=str(cron_expression),
+                callback=lambda: print("cron in db handler"),
+                interval=600,
+            )  # TODO remove default value
+        else:
+            cron = None
 
         location_str = str(user_record.location)
         location = Geolocation.from_json(location_str)
