@@ -1,6 +1,6 @@
-from _cron import Cron
-from model.session import Session
-from model.geolocation import Geolocation
+from .._cron import Cron
+from .geolocation import Geolocation
+from .session import Session
 
 
 class User:

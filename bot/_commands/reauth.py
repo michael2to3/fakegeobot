@@ -1,11 +1,10 @@
-import logging
+from sqlite3 import OperationalError
+
+from .command import Command
+from .._user import RequestCode
 from telegram import Update
 from telegram.ext import ContextTypes
 from telethon.errors import FloodWaitError
-from sqlite3 import OperationalError
-from _commands import Command
-from model import Session, User
-from _user import RequestCode
 
 
 class Reauth(Command):

@@ -1,8 +1,8 @@
+from .._action import Fakelocation
+from .._commands import Command
 from telegram import Update
 from telegram.ext import ContextTypes
 from telethon.errors import AuthKeyUnregisteredError
-from _commands import Command
-from _action import Fakelocation
 
 
 class Send(Command):

@@ -1,18 +1,17 @@
-from _commands.command import Command
-from _commands.start import Start
-from _commands.help import Help
-from _commands.auth import Auth
-from _commands.code import Code
-from _commands.schedule import Schedule
-from _commands.send import Send
-from _commands.delete import Delete
-from _commands.disable import Disable
-from _commands.enable import Enable
-from _commands.location import Location
-from _commands.recipient import Recipient
-from _commands.reauth import Reauth
-from _commands.info import Info
-
+from .auth import Auth
+from .code import Code
+from .command import Command
+from .delete import Delete
+from .disable import Disable
+from .enable import Enable
+from .help import Help
+from .info import Info
+from .location import Location
+from .reauth import Reauth
+from .recipient import Recipient
+from .schedule import Schedule
+from .send import Send
+from .start import Start
 
 __all__ = [
     "Command",

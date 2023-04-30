@@ -1,4 +1,4 @@
-from model import User, ApiApp
+from ..model import ApiApp, User
 from telethon import TelegramClient
 
 

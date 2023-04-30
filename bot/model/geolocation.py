@@ -1,5 +1,6 @@
-from telethon.types import InputMediaGeoLive, InputGeoPoint
 import json
+
+from telethon.types import InputGeoPoint, InputMediaGeoLive
 
 
 class Geolocation:

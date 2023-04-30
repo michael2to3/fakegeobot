@@ -1,6 +1,6 @@
+from .command import Command
 from telegram import Update
 from telegram.ext import ContextTypes
-from _commands import Command
 
 
 class Info(Command):

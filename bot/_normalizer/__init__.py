@@ -1,5 +1,5 @@
-from _normalizer.authcode import AuthCode
-from _normalizer.phonenumber import PhoneNumber
-from _normalizer.normalizer import Normalizer
+from .authcode import AuthCode
+from .normalizer import Normalizer
+from .phonenumber import PhoneNumber
 
 __all__ = ["AuthCode", "PhoneNumber", "Normalizer"]

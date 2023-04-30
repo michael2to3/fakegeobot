@@ -1,7 +1,7 @@
+from .command import Command
+from ..model import Geolocation
 from telegram import Update
 from telegram.ext import ContextTypes
-from _commands import Command
-from model import Geolocation
 
 
 class Location(Command):

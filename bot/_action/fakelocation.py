@@ -1,9 +1,9 @@
 import logging
+
+from .action import Action
+from ..model import ApiApp, Geolocation, Session
 from telethon import TelegramClient
 from telethon.types import InputMediaGeoLive
-from model import User
-from _action import Action
-from model import ApiApp, Session, Geolocation
 
 
 class Fakelocation(Action):

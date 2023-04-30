@@ -4,9 +4,10 @@ import multiprocessing
 import os
 import sys
 
-from bot import Bot
-from _config import Config
-from _db import DatabaseHandler
+from ._config import Config
+from ._db import DatabaseHandler
+
+from .bot import Bot
 
 
 def setup_logging():
@@ -23,7 +24,7 @@ def get_root_path():
 def generate_bot():
     config = Config()
     db = DatabaseHandler(config.db_path, config.db_name, config.api)
-    return Bot(config.api, config._bot_token, db)
+    return Bot(config.api, config.bot_token, db)
 
 
 def start_bot():

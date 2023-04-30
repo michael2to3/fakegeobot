@@ -1,29 +1,29 @@
 import logging
 import traceback
-import asyncio
+from sqlite3 import OperationalError
+from typing import Dict
 
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
-from sqlite3 import OperationalError
-from typing import Dict
-from _db import DatabaseHandler
-from _commands import (
-    Start,
-    Help,
+
+from ._commands import (
     Auth,
     Code,
-    Schedule,
-    Send,
     Delete,
     Disable,
     Enable,
-    Location,
-    Recipient,
-    Reauth,
+    Help,
     Info,
+    Location,
+    Reauth,
+    Recipient,
+    Schedule,
+    Send,
+    Start,
 )
-from model import ApiApp, User
-from abstract_bot import AbstractBot
+from ._db import DatabaseHandler
+from .abstract_bot import AbstractBot
+from .model import ApiApp, User
 
 
 class Bot(AbstractBot):

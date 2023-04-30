@@ -1,7 +1,8 @@
+from .command import Command
+from .._config import Config
+from ..model import Geolocation
 from telegram import Update
 from telegram.ext import ContextTypes
-from _commands import Command
-from model import Geolocation
 
 
 class Recipient(Command):
@@ -38,9 +39,10 @@ class Recipient(Command):
             self.logger.error("Not enough arguments")
             raise ValueError("Not enough arguments")
 
-        interval = 600
         lat = float(location[0])
         long = float(location[1])
-        interval = int(location[2]) if len(location) == 3 else 10
+        interval = (
+            int(location[2]) if len(location) == 3 else Config().location_interval
+        )
 
         return Geolocation(lat=lat, long=long, interval=interval)

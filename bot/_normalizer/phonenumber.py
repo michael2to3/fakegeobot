@@ -1,4 +1,4 @@
-from _normalizer.normalizer import Normalizer
+from .normalizer import Normalizer
 
 
 class PhoneNumber(Normalizer):

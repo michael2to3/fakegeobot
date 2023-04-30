@@ -1,16 +1,22 @@
+from .command import Command
 from telegram import Update
 from telegram.ext import ContextTypes
-from _commands import Command
 
 
 class Disable(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
-        emess = "Your account is disable"
-        try:
-            self.bot.users[chat_id].cron.stop()
-        except Exception as e:
-            self.logger.error(str(e))
-            emess = f"Oops somthing broke - {str(e)}"
+        if chat_id not in self.bot.users:
+            await update.message.reply_text("User not found")
+            self.logger.info(f"User {chat_id} not found")
+            return
 
-        await update.message.reply_text(emess)
+        user = self.bot.users[chat_id]
+        if user.cron is None:
+            await update.message.reply_text("Your account not initialized cron")
+            self.logger.info(f"User {chat_id} not initialized cron")
+            return
+
+        self.bot.users[chat_id].cron.stop()
+
+        await update.message.reply_text("Your account is disable")

@@ -1,8 +1,9 @@
 import logging
 from abc import ABC, abstractmethod
+
+from ..abstract_bot import AbstractBot
 from telegram import Update
 from telegram.ext import ContextTypes
-from abstract_bot import AbstractBot
 
 
 class Command(ABC):

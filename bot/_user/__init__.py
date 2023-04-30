@@ -1,3 +1,3 @@
-from _user.requestcode import RequestCode
+from .requestcode import RequestCode
 
 __all__ = ["RequestCode"]

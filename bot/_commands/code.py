@@ -1,7 +1,7 @@
+from .command import Command
+from .._normalizer import AuthCode
 from telegram import Update
 from telegram.ext import ContextTypes
-from _commands import Command
-from _normalizer import AuthCode
 
 
 class Code(Command):
