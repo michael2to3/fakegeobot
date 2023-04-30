@@ -57,9 +57,6 @@ It's need to bypass protect telegram
             emess = "Oops bad try access your account"
         except FloodWaitError as e:
             emess = f"Oops flood exception! Wait: {e.seconds} seconds"
-        except OperationalError as e:
-            self.logger.error(str(e))
-            emess = "Oops database is fire!"
         else:
             self.bot.users[chat_id] = user
             self.bot.db.save_user(user)
