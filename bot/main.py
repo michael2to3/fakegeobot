@@ -6,7 +6,6 @@ import sys
 
 from bot import Bot
 from _config import Config
-from model import ApiApp
 from _db import DatabaseHandler
 
 
@@ -22,10 +21,9 @@ def get_root_path():
 
 
 def generate_bot():
-    cnf = Config()
-    api = ApiApp(cnf.api_id, cnf.api_hash)
-    db = DatabaseHandler(cnf.db_path, cnf.db_name)
-    return Bot(api, cnf._bot_token, db)
+    config = Config()
+    db = DatabaseHandler(config.db_path, config.db_name, config.api)
+    return Bot(config.api, config._bot_token, db)
 
 
 def start_bot():

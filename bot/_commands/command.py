@@ -11,5 +11,5 @@ class Command(ABC):
         self.logger = logging.getLogger(__name__)
 
     @abstractmethod
-    async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+    async def handle(self, update: Update, _: ContextTypes) -> None:
         pass
