@@ -1,18 +1,14 @@
-from _normalizer import Normalizer
+from _normalizer.normalizer import Normalizer
 
 
 class AuthCode(Normalizer):
-    _authcode: str
-
-    def __init__(self, authcode: str):
-        self._authcode = authcode
-
-    def normalize(self, text: str) -> str:
+    @staticmethod
+    def normalize(text: str) -> str:
         code = text
         index_first_digit = [i.isdigit() for i in code].index(True)
 
         code = code[index_first_digit:].rstrip()
-        code = self.bypass_protect_tg(code)
+        code = AuthCode._bypass_protect_tg(code)
 
         has_not_allow_symbol = any(not i.isdigit() for i in code)
         if has_not_allow_symbol:
@@ -24,5 +20,6 @@ class AuthCode(Normalizer):
 
         return code
 
-    def bypass_protect_tg(self, text: str) -> str:
+    @staticmethod
+    def _bypass_protect_tg(text: str) -> str:
         return text.replace(".", "")

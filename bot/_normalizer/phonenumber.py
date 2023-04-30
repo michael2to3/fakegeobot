@@ -1,14 +1,10 @@
-from _normalizer import Normalizer
+from _normalizer.normalizer import Normalizer
 
 
 class PhoneNumber(Normalizer):
-    _phonenumber: str
-
-    def __init__(self, phonenumber: str):
-        self._phonenumber = phonenumber
-
-    def normalize(self, text: str) -> str:
-        phone = self._remove_junk(text)
+    @staticmethod
+    def normalize(text: str) -> str:
+        phone = PhoneNumber._remove_junk(text)
 
         index_first_digit = [i.isdigit() for i in phone].index(True)
         has_plus = phone[index_first_digit - 1] == "+"
@@ -25,7 +21,8 @@ class PhoneNumber(Normalizer):
         preffix = "+" if has_plus else ""
         return preffix + phone
 
-    def _remove_junk(self, utext: str) -> str:
+    @staticmethod
+    def _remove_junk(utext: str) -> str:
         junk = [" ", "(", ")", "_"]
         for i in junk:
             utext = utext.replace(i, "")

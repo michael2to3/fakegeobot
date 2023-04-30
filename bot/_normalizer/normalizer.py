@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 
 class Normalizer(ABC):
+    @staticmethod
     @abstractmethod
-    def normalize(self, text: str) -> str:
+    def normalize(text: str) -> str:
         pass
