@@ -124,6 +124,10 @@ class Bot(AbstractBot):
                 )
             )
 
+        for user in self._users.values():
+            if user.cron:
+                user.cron.start()
+
         app.run_polling()
 
     @property
