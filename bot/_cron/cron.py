@@ -1,6 +1,9 @@
 import logging
-import aiocron
 from typing import Callable, List, Any, Coroutine
+import asyncio
+import schedule
+from croniter import croniter
+import time
 
 
 class FloodException(BaseException):
@@ -61,17 +64,23 @@ class Cron:
     async def start(self):
         self._logger.info("Starting cron")
         if self._job is None:
-            self._job = aiocron.crontab(
-                self._expression, func=self.async_callback_wrapper, start=True
-            )
+            self._job = asyncio.ensure_future(self._schedule_runner())
 
-    async def async_callback_wrapper(self):
+    async def _schedule_runner(self):
+        iter = croniter(self._expression, time.time())
+        while True:
+            next_run = iter.get_next(float)
+            await asyncio.sleep(next_run - time.time())
+            await self._async_callback_wrapper()
+
+    async def _async_callback_wrapper(self):
+        self._logger.info("Start callback in cron")
         await self._callback()
 
     async def stop(self):
         self._logger.info("Stopping cron")
         if self._job:
-            self._job.stop()
+            self._job.cancel()
             self._job = None
 
     def __str__(self) -> str:
