@@ -61,10 +61,13 @@ class Cron:
             ):
                 raise FloodException("Cron schedule is too frequent")
 
-    async def start(self):
+    def start(self):
         self._logger.info("Starting cron")
         if self._job is None:
             self._job = asyncio.ensure_future(self._schedule_runner())
+
+    def is_running(self) -> bool:
+        return self._job is not None
 
     async def _schedule_runner(self):
         iter = croniter(self._expression, time.time())
@@ -77,14 +80,14 @@ class Cron:
         self._logger.info("Start callback in cron")
         await self._callback()
 
-    async def stop(self):
+    def stop(self):
         self._logger.info("Stopping cron")
         if self._job:
             self._job.cancel()
             self._job = None
 
     def __str__(self) -> str:
-        return self._expression
+        return f"Cron(expression={self._expression}, timeout={self._timeout}, is_running={self.is_running()})"
 
     @property
     def expression(self) -> str:
