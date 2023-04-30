@@ -50,6 +50,9 @@ class Bot(AbstractBot):
         if handler:
             try:
                 await handler.handle(update, context)
+            except ValueError as e:
+                self.logger.error(f"ValueError: {e}")
+                await update.message.reply_text(f"ValueError: {e}")
             except Exception as e:
                 error_traceback = traceback.format_exc()
                 self.logger.error(
