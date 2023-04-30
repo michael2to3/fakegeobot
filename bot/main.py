@@ -7,6 +7,7 @@ import sys
 from bot import Bot
 from _config import Config
 from model import ApiApp
+from _db import DatabaseHandler
 
 
 def setup_logging():
@@ -21,10 +22,10 @@ def get_root_path():
 
 
 def generate_bot():
-    root = get_root_path()
     cnf = Config()
-    api = ApiApp(cnf._api_id, cnf._api_hash)
-    return Bot(api, cnf._bot_token, os.path.join(root, cnf._db_path), "user.db")
+    api = ApiApp(cnf.api_id, cnf.api_hash)
+    db = DatabaseHandler(cnf.db_path, cnf.db_name)
+    return Bot(api, cnf._bot_token, db)
 
 
 def start_bot():
