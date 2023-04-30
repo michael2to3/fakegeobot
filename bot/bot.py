@@ -1,5 +1,5 @@
 import logging
-from croniter.croniter import CroniterBadCronError, CroniterNotAlphaError
+import traceback
 
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
@@ -7,9 +7,10 @@ from typing import Dict
 from _db import DatabaseHandler
 from _commands import Start, Help, Auth, Code, Schedule, Send, Delete, Disable, Enable
 from model import ApiApp, User
+from abstract_bot import AbstractBot
 
 
-class Bot:
+class Bot(AbstractBot):
     logger: logging.Logger
     _api: ApiApp
     _app: Application
@@ -50,7 +51,10 @@ class Bot:
             try:
                 await handler.handle(update, context)
             except Exception as e:
-                self.logger.error(f"Error while handling the command: {command}, {e}")
+                error_traceback = traceback.format_exc()
+                self.logger.error(
+                    f"Error while handling the command: {command}, {e}\n{error_traceback}"
+                )
                 await update.message.reply_text(
                     f"Oops! An error occurred while handling the command: {command}."
                 )
@@ -79,3 +83,15 @@ class Bot:
                 )
             )
         app.run_polling()
+
+    @property
+    def users(self) -> Dict[int, User]:
+        return self._users
+
+    @property
+    def db(self) -> DatabaseHandler:
+        return self._db
+
+    @property
+    def api(self) -> ApiApp:
+        return self._api
