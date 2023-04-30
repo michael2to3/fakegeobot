@@ -15,5 +15,8 @@ class Send(Command):
         except AuthKeyUnregisteredError as e:
             self.logger.error(str(e))
             emess = "Your token is not registered"
+        except ConnectionError as e:
+            self.logger.error(str(e))
+            emess = "Connection error"
         finally:
             await update.message.reply_text(emess)

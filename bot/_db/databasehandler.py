@@ -121,11 +121,12 @@ class DatabaseHandler:
         else:
             cron = None
 
-        location_str = str(user_record.location)
-        location = Geolocation.from_json(location_str)
+        location = None
+        if user_record.location is not None:
+            location_str = str(user_record.location)
+            location = Geolocation.from_json(location_str)
+
         recipient = cast(Optional[str], user_record.recipient)
-        if recipient is None:
-            recipient = "@me"
 
         user = User(cron, location, session, recipient)
         return user

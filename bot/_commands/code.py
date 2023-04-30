@@ -1,23 +1,28 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from _commands import Command
+from _normalizer import AuthCode
 
 
 class Code(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         auth_code = update.message.text.split(" ")[1]
+        chat_id = update.message.chat_id
+
         if auth_code is None:
-            await update.message.reply_text("Bad value of command")
+            await update.message.reply_text("Please enter auth code")
+            return
+        if chat_id not in self.bot.users:
+            self.logger.warn(f"User not found: {chat_id}")
+            await update.message.reply_text("User not found")
             return
 
-        chat_id = update.message.chat_id
         emess = "Success! Code complete!"
 
         try:
-            self.bot.users[chat_id].session.auth_code = int(auth_code)
-        except ValueError:
-            emess = "Bad value of command"
-        except KeyError:
-            emess = "User not found, need first step /auth after send code"
+            code = AuthCode.normalize(auth_code)
+            self.bot.users[chat_id].session.auth_code = int(code)
+        except ValueError as e:
+            emess = "ValueError: " + str(e)
 
         await update.message.reply_text(emess)
