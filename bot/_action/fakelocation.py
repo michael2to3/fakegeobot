@@ -17,6 +17,15 @@ class Fakelocation(Action):
         self._user = user
 
     async def execute(self):
+        if self._user.session.phone is None:
+            raise ValueError("Please enter your phone number")
+        if self._user.session.auth_code is None or self._user.session.phone_code_hash is None:
+            raise ValueError("Please enter your auth code")
+        if self._user.location is None:
+            raise ValueError("Please enter your location")
+        if self._user.recipient is None:
+            raise ValueError("Please enter your recipient")
+
         client = TelegramClient(
             self._user.session.session_name, self._api.id, self._api.hash
         )
