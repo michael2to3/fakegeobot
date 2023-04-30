@@ -49,3 +49,6 @@ class User:
     @recipient.setter
     def recipient(self, value):
         self._recipient = value
+
+    def __str__(self):
+        return f"User(cron={self.cron}, location={self.location}, session={self.session}, recipient={self.recipient})"

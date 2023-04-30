@@ -62,3 +62,6 @@ class Session:
     @phone_code_hash.setter
     def phone_code_hash(self, value: str | None):
         self._phone_code_hash = value
+
+    def __str__(self) -> str:
+        return f"Session({self.session_name}, {self.username}, {self.chat_id}, {self.phone}, {self.auth_code}, {self.phone_code_hash})"
