@@ -14,25 +14,27 @@ class Schedule(Command):
             return
 
         if schedule.find(" ") == -1:
-            await update.message.reply_text(f"Your schedule {self.bot._users[id].session.schedule}")
+            await update.message.reply_text(
+                f"Your schedule {self.bot.users[id].session.schedule}"
+            )
             return
 
         emess = "Done!"
         try:
-            self.bot._users[id].cron.cron_expression = schedule
+            self.bot.users[id].cron.cron_expression = schedule
         except CroniterNotAlphaError as e:
-            self.bot.logger.error(str(e))
+            self.logger.error(str(e))
             emess = "Error, schedule not change"
         except CroniterBadCronError as e:
-            self.bot.logger.error(str(e))
+            self.logger.error(str(e))
             emess = "Not valid range"
         except ValueError as e:
-            self.bot.logger.error(str(e))
+            self.logger.error(str(e))
             emess = str(e)
         except Exception as e:
             emess = "Oops unknown error"
-            self.bot.logger.error(e)
+            self.logger.error(e)
         else:
-            self.bot._db.save_user(self.bot._users[id])
+            self.bot.db.save_user(self.bot.users[id])
 
         await update.message.reply_text(emess)

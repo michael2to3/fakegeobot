@@ -10,10 +10,10 @@ class Send(Command):
         chat_id = update.message.chat_id
         emess = "Well done"
         try:
-            action = Fakelocation(self.bot._api, self.bot._users[chat_id])
+            action = Fakelocation(self.bot.api, self.bot.users[chat_id])
             await action.execute()
         except AuthKeyUnregisteredError as e:
-            self.bot.logger.error(str(e))
+            self.logger.error(str(e))
             emess = "Your token is not registered"
         finally:
             await update.message.reply_text(emess)

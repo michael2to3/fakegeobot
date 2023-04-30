@@ -8,9 +8,9 @@ class Disable(Command):
         chat_id = update.message.chat_id
         emess = "Your account is disable"
         try:
-            self.bot._users[chat_id].cron.stop()
+            self.bot.users[chat_id].cron.stop()
         except Exception as e:
-            self.bot.logger.error(str(e))
+            self.logger.error(str(e))
             emess = f"Oops somthing broke - {str(e)}"
 
         await update.message.reply_text(emess)

@@ -5,7 +5,7 @@ from _commands import Command
 
 class Code(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        auth_code = update.message.text
+        auth_code = update.message.text.split(" ")[1]
         if auth_code is None:
             await update.message.reply_text("Bad value of command")
             return
@@ -14,7 +14,7 @@ class Code(Command):
         emess = "Success! Code complete!"
 
         try:
-            self.bot._users[chat_id].session.auth_code = int(auth_code)
+            self.bot.users[chat_id].session.auth_code = int(auth_code)
         except ValueError:
             emess = "Bad value of command"
         except KeyError:

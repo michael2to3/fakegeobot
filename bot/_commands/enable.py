@@ -8,9 +8,9 @@ class Enable(Command):
         chat_id = update.message.chat_id
         emess = "Your account is enable"
         try:
-            self.bot._users[chat_id].cron.start()
+            self.bot.users[chat_id].cron.start()
         except Exception as e:
-            self.bot.logger.error(str(e))
+            self.logger.error(str(e))
             emess = f"Oops somthing broke - {str(e)}"
 
         await update.message.reply_text(emess)
