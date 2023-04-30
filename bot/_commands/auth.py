@@ -35,8 +35,6 @@ It's need to bypass protect telegram
 <b>⚠️ Warning</b>: By creating an authentication session, you are granting this bot full access to your Telegram account. This includes the ability to read your messages, send messages on your behalf, and manage your account. Please ensure you trust the bot and its developers before proceeding. If you have any concerns, please review the bot's source code or contact the developers directly.
 """
 
-        # @TODO remove default value
-        geo = Geolocation(0, 0, 1)
         info = Session(
             session_name=str(chat_id),
             username=username,
@@ -45,20 +43,19 @@ It's need to bypass protect telegram
             auth_code=None,
             phone_code_hash=None,
         )
-        user = User(cron=None, location=geo, session=info, recipient="@me")
+        user = User(cron=None, location=None, session=info, recipient=None)
 
         try:
             user.session.phone_code_hash = await RequestCode.get(user, self.bot.api)
         except RuntimeError:
             emess = "Oops bad try access your account"
-        except ValueError as e:
-            emess = str(e)
         except FloodWaitError as e:
             emess = f"Oops flood exception! Wait: {e.seconds} seconds"
         except OperationalError as e:
             self.logger.error(str(e))
             emess = "Oops database is fire!"
         else:
+            self.bot.users[chat_id] = user
             self.bot.db.save_user(user)
         finally:
             await update.message.reply_text(emess)
