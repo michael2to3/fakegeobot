@@ -8,6 +8,10 @@ from _commands.send import Send
 from _commands.delete import Delete
 from _commands.disable import Disable
 from _commands.enable import Enable
+from _commands.location import Location
+from _commands.recipient import Recipient
+from _commands.reauth import Reauth
+from _commands.info import Info
 
 
 __all__ = [
@@ -21,4 +25,8 @@ __all__ = [
     "Delete",
     "Disable",
     "Enable",
+    "Location",
+    "Recipient",
+    "Reauth",
+    "Info",
 ]
