@@ -10,7 +10,9 @@ class FloodException(BaseException):
 
 
 class Cron:
-    def __init__(self, callback: Callable[[], None], cron_expression: str, interval: int):
+    def __init__(
+        self, callback: Callable[[], None], cron_expression: str, interval: int
+    ):
         self.callback = callback
         self.cron_expression = cron_expression
         self.interval = interval
