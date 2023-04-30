@@ -22,6 +22,7 @@ class Code(Command):
         try:
             code = AuthCode.normalize(auth_code)
             self.bot.users[chat_id].session.auth_code = int(code)
+            self.bot.db.save_user(self.bot.users[chat_id])
         except ValueError as e:
             emess = "ValueError: " + str(e)
 

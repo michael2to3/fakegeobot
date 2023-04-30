@@ -4,7 +4,7 @@ from telegram.ext import ContextTypes
 from telethon.errors import FloodWaitError
 from sqlite3 import OperationalError
 from _commands import Command
-from model import Session, User, Geolocation
+from model import Session, User
 from _user import RequestCode
 
 
@@ -13,14 +13,20 @@ class Auth(Command):
         chat_id = update.message.chat_id
 
         if chat_id in self.bot.users:
-            emess = "You already auth, if you want reauth you can /delete self"
-            await update.message.reply_text(emess)
+            await update.message.reply_text(
+                "You already auth, if you want reauth you can rewrite your session with /reauth"
+            )
             return
 
         username = "Not change"
         if update.message.from_user is not None:
             username = update.message.from_user.full_name
 
+        if update.message.text.count(" ") < 1:
+            await update.message.reply_text(
+                "Please enter your phone number, e.g. +12012345678"
+            )
+            return
         phone = update.message.text.split(" ")[1]
         if phone is None:
             await update.message.reply_text("Please enter your phone number")
@@ -32,7 +38,7 @@ For example: Login code: 61516
 You put: /code 6.1.5.1.6
 It's need to bypass protect telegram
 
-<b>⚠️ Warning</b>: By creating an authentication session, you are granting this bot full access to your Telegram account. This includes the ability to read your messages, send messages on your behalf, and manage your account. Please ensure you trust the bot and its developers before proceeding. If you have any concerns, please review the bot's source code or contact the developers directly.
+*⚠️ Warning*: By creating an authentication session, you are granting this bot *full access* to your Telegram account. This includes the ability to read your messages, send messages on your behalf, and manage your account. Please ensure you trust the bot and its developers before proceeding. If you have any concerns, please review the bot's source code or contact the developers directly.
 """
 
         info = Session(
@@ -58,4 +64,4 @@ It's need to bypass protect telegram
             self.bot.users[chat_id] = user
             self.bot.db.save_user(user)
         finally:
-            await update.message.reply_text(emess)
+            await update.message.reply_text(emess, parse_mode="Markdown")
