@@ -8,6 +8,7 @@ from ..model import ApiApp, Geolocation, Session as UserSession, User
 from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
+from sqlalchemy.pool import NullPool
 
 Base = declarative_base()
 
@@ -30,33 +31,36 @@ class UserRecord(Base):
 
 class DatabaseHandler:
     logger: logging.Logger
-    _name_db: str
-    _path_db: str
     engine = None
     SessionLocal = None
     _instance = None
     _api: ApiApp
+    _url: str
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self, path_db: str, name_db: str, api: ApiApp):
+    def __init__(self, api: ApiApp, uri: str):
         if not self.engine:
             self.logger = logging.getLogger(__name__)
-            self._name_db = name_db
-            self._path_db = path_db + "/" + self._name_db
             self.engine = create_engine(
-                f"sqlite:///{self._path_db}", connect_args={"timeout": 30}
+                uri,
+                connect_args={"timeout": 30},
+                poolclass=NullPool,
             )
-            Base.metadata.create_all(bind=self.engine)
             self.SessionLocal = scoped_session(
                 sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
             )
             self._api = api
+            Base.metadata.create_all(bind=self.engine)
         else:
-            self.logger.warning("Trying to initialize DatabaseHandler again.")
+            self.logger.warning("Database already initialized")
+
+    def close(self):
+        if self.engine:
+            self.engine.dispose()
 
     def save_user(self, user: User):
         user_record = UserRecord(
