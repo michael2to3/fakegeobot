@@ -41,6 +41,8 @@ class Code(Command):
         timeout = self._config.cron_timeout
         if user.cron is None:
             return self._default_cron(user)
+        else:
+            user.cron.stop()
 
         if user.location is not None:
             location = user.location
