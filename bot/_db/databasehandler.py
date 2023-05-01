@@ -152,9 +152,9 @@ class DatabaseHandler:
             and cron_timeout is not None
         ):
             cron = Cron(
-                expression=str(cron_expression),
+                cron_expression=str(cron_expression),
                 callback=Fakelocation(self._api, session, location, recipient).execute,
-                timeout=cron_timeout,
+                callback_timeout=cron_timeout,
             )
         else:
             cron = None

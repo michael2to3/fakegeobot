@@ -1,3 +1,3 @@
-from .cron import Cron, FloodException
+from .cron import Cron
 
-__all__ = ["Cron", "FloodException"]
+__all__ = ["Cron"]

@@ -3,86 +3,82 @@ import logging
 import time
 from typing import Any, Callable, Coroutine
 from croniter import croniter
-from .._config import Config
-
-
-class FloodException(BaseException):
-    __slots__ = ("message",)
-
-    def __init__(self, message: str):
-        self.message = message
 
 
 class Cron:
     __slots__ = (
         "_logger",
         "_callback",
-        "_expression",
-        "_timeout",
-        "_job",
-        "_last_callback_time",
+        "_cron_expression",
+        "_callback_timeout",
+        "_running_task",
+        "_last_callback_time_seconds",
     )
 
     _logger: logging.Logger
     _callback: Callable[[], Coroutine[Any, Any, None]]
-    _expression: str
-    _timeout: int
-    _job: Any
-    _last_callback_time: float
+    _cron_expression: str
+    _callback_timeout: int
+    _running_task: Any
+    _last_callback_time_seconds: float
 
     def __init__(
         self,
         callback: Callable[[], Coroutine[Any, Any, None]],
-        expression: str,
-        timeout: int | None = None,
+        cron_expression: str,
+        callback_timeout: int,
     ):
         self._logger = logging.getLogger(__name__)
         self._callback = callback
-        self._expression = expression
-        self._timeout = timeout if timeout is not None else Config().cron_timeout
-        self._job = None
-        self._last_callback_time = 0
+        self._cron_expression = cron_expression
+        self._callback_timeout = callback_timeout
+        self._running_task = None
+        self._last_callback_time_seconds = 0
 
-    def start(self):
+    def start(self) -> None:
         self._logger.info("Starting cron")
-        if self._job is None:
-            self._job = asyncio.ensure_future(self._schedule_runner())
+        if self._running_task is None:
+            self._running_task = asyncio.ensure_future(self._schedule_runner())
 
     def is_running(self) -> bool:
-        return self._job is not None
+        return self._running_task is not None
 
     async def _schedule_runner(self):
-        iter = croniter(self._expression, time.time())
+        cron_iter = croniter(self._cron_expression, time.time())
         while True:
-            next_run = iter.get_next(float)
+            next_run = cron_iter.get_next(float)
             await asyncio.sleep(next_run - time.time())
             current_time = time.time()
-            if current_time - self._last_callback_time >= self._timeout:
+            if (
+                current_time - self._last_callback_time_seconds
+                >= self._callback_timeout
+            ):
                 self._logger.info("Scheduling callback")
-                await self._async_callback_wrapper()
-                self._last_callback_time = current_time
+                self._last_callback_time_seconds = current_time
+                try:
+                    await self._async_callback_wrapper()
+                except Exception as e:
+                    self._logger.error(f"Error in callback: {e}")
             else:
-                self._logger.info(
-                    f"Sleeping {self._timeout - (current_time - self._last_callback_time)} seconds"
-                )
+                self._logger.info("Scheduling next run")
 
     async def _async_callback_wrapper(self):
         self._logger.info("Start callback in cron")
         await self._callback()
 
-    def stop(self):
+    def stop(self) -> None:
         self._logger.info("Stopping cron")
-        if self._job:
-            self._job.cancel()
-            self._job = None
+        if self._running_task:
+            self._running_task.cancel()
+            self._running_task = None
 
     def __str__(self) -> str:
-        return f"Cron(expression={self._expression}, timeout={self._timeout}, is_running={self.is_running()})"
+        return f"Cron(expression={self._cron_expression}, timeout={self._callback_timeout}, is_running={self.is_running()})"
 
     @property
     def expression(self) -> str:
-        return self._expression
+        return self._cron_expression
 
     @property
     def timeout(self) -> int:
-        return self._timeout
+        return self._callback_timeout

@@ -1,6 +1,7 @@
 from .._action import Fakelocation
 from .._commands import Command
 from .._cron import Cron
+from .._config import Config
 from croniter.croniter import CroniterBadCronError, CroniterNotAlphaError
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -37,7 +38,10 @@ class Schedule(Command):
                 callback=Fakelocation(
                     self.bot.api, user.session, user.location, user.recipient
                 ).execute,
-                expression=schedule,
+                cron_expression=schedule,
+                callback_timeout=user.cron.timeout
+                if user.cron is not None
+                else Config().cron_timeout,
             )
 
             user.cron.start()
