@@ -1,5 +1,5 @@
-import unittest
-from unittest.mock import MagicMock, patch
+import asynctest
+from unittest.mock import MagicMock, patch, AsyncMock
 
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -10,7 +10,7 @@ from bot._db import DatabaseHandler
 from bot.bot import Bot
 
 
-class TestDisable(unittest.TestCase):
+class TestDisable(asynctest.TestCase):
     def setUp(self):
         self.api = MagicMock(spec=ApiApp)
         self.token = "fake_token"
@@ -23,7 +23,7 @@ class TestDisable(unittest.TestCase):
         disable_command = Disable(self.bot)
 
         update.message.chat_id = 1
-        update.message.reply_text = MagicMock()
+        update.message.reply_text = AsyncMock()
 
         self.bot.users[1] = MagicMock(spec=User)
 

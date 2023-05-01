@@ -23,7 +23,9 @@ class TestRequestCode(unittest.TestCase):
 
         import asyncio
 
-        result = asyncio.run(RequestCode.get(mock_user, mock_api))
+        result = asyncio.get_event_loop().run_until_complete(
+            RequestCode.get(mock_user, mock_api)
+        )
         self.assertEqual(result, "test_hash")
 
         mock_client_instance.connect.assert_called_once()

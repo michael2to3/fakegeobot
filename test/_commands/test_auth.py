@@ -37,9 +37,23 @@ class TestAuth(asynctest.TestCase):
         self.db = MagicMock(spec=DatabaseHandler)
         self.bot = TestAuth.TestBot(self.api, self.db)
 
+    @patch("bot._config.config.config")
     @patch("bot._user.RequestCode")
     @patch("telethon.client.auth.AuthMethods.send_code_request", new_callable=AsyncMock)
-    async def test_handle(self, mock_send_code_request, MockRequestCode):
+    async def test_handle(self, mock_send_code_request, MockRequestCode, config_mock):
+        config_mock.side_effect = lambda name: {
+            "API_ID": "12345",
+            "API_HASH": "valid_api_hash",
+            "BOT_TOKEN": "test_bot_token",
+            "DB_URI": "sqlite:///test_db.sqlite3",
+            "CRON_TIMEOUT": "60",
+            "CRON_EXPRESSION": "*/30 * * * *",
+            "LOCATION_INTERVAL": "60",
+            "LOCATION_LAT": "42.3601",
+            "LOCATION_LONG": "71.0589",
+            "RECIPIENT": "test_recipient",
+        }[name]
+
         update = MagicMock(spec=Update)
         context = MagicMock(spec=ContextTypes.DEFAULT_TYPE)
         auth = Auth(self.bot)
