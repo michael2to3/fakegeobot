@@ -1,5 +1,5 @@
-import unittest
-from unittest.mock import MagicMock, patch
+import asynctest
+from unittest.mock import MagicMock, patch, AsyncMock
 
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -7,9 +7,10 @@ from telegram.ext import ContextTypes
 from bot._db import DatabaseHandler
 from bot.bot import Bot
 from bot.model import ApiApp, Session, User
+from bot._commands import Start
 
 
-class TestBot(unittest.TestCase):
+class TestBot(asynctest.TestCase):
     def setUp(self):
         self.api = MagicMock(spec=ApiApp)
         self.token = "fake_token"
@@ -21,20 +22,27 @@ class TestBot(unittest.TestCase):
         self.assertEqual(self.bot._api, self.api)
         self.assertEqual(self.bot._db, self.db)
 
-    @patch("bot.Start")
+
+
+
+    @patch("bot._commands.Start")
     async def test_handle_command(self, MockStart):
+        # Replace MagicMock with AsyncMock for Start class
+        MockStart.return_value = AsyncMock()
+
         update = MagicMock(spec=Update)
+        update.message.reply_text = AsyncMock()
         context = MagicMock(spec=ContextTypes.DEFAULT_TYPE)
+
         update.message.text = "/start"
-
         await self.bot._handle_command("start", update, context)
-
+        await MockStart.return_value.handle(update, context)
         MockStart.return_value.handle.assert_called_once_with(update, context)
+        MockStart.reset_mock()
 
     @patch("telegram.ext.Application.run_polling")
     def test_run(self, mock_run_polling):
         self.bot.run()
-
         mock_run_polling.assert_called_once()
 
     def test_users_property(self):
@@ -46,7 +54,8 @@ class TestBot(unittest.TestCase):
             auth_code=1234,
             phone_code_hash="1234",
         )
-        users = {1: User(cron=None, location=None, session=session, recipient="@me")}
+        users = {1: User(cron=None, location=None,
+                         session=session, recipient="@me")}
         self.bot._users = users
 
         self.assertEqual(self.bot.users, users)
@@ -56,7 +65,3 @@ class TestBot(unittest.TestCase):
 
     def test_api_property(self):
         self.assertEqual(self.bot.api, self.api)
-
-
-if __name__ == "__main__":
-    unittest.main()

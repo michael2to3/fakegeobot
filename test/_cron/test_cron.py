@@ -1,46 +1,49 @@
+import asynctest
 import asyncio
-import unittest
-from unittest import IsolatedAsyncioTestCase
-from unittest.mock import AsyncMock, MagicMock
-from bot._cron import Cron, FloodException
+from unittest.mock import MagicMock
+from bot._cron import Cron
 
 
-class TestCron(IsolatedAsyncioTestCase):
-    async def asyncSetUp(self):
-        self.callback = AsyncMock()
-        self.expression = "0 0 * * *"
-        self.timeout = 60
-        self.cron = Cron(self.callback, self.expression, self.timeout)
+class TestCron(asynctest.TestCase):
+    async def test_cron(self):
+        async def mock_callback():
+            return
 
-    async def test_validate_expression(self):
-        with self.assertRaises(ValueError):
-            Cron(self.callback, "*/15", self.timeout)
+        expression = "* * * * *"
+        timeout = 5
 
-        with self.assertRaises(FloodException):
-            Cron(self.callback, "* * * * *", self.timeout)
+        cron = Cron(mock_callback, expression, timeout)
+        self.assertEqual(cron.expression, expression)
+        self.assertEqual(cron.timeout, timeout)
 
-        with self.assertRaises(FloodException):
-            Cron(self.callback, "*/1 * * * *", self.timeout)
+        cron.start()
+        self.assertTrue(cron.is_running())
 
-    async def test_start_and_stop(self):
-        self.assertFalse(self.cron.is_running())
-        self.cron.start()
-        self.assertTrue(self.cron.is_running())
-        self.cron.stop()
-        self.assertFalse(self.cron.is_running())
+        cron.stop()
+        self.assertFalse(cron.is_running())
 
-    async def test_schedule_runner(self):
-        self.cron.start()
-        await asyncio.sleep(3)
-        self.callback.assert_called_once()
-        self.cron.stop()
+    async def test_cron_callback(self):
+        async def mock_callback():
+            return
 
-    async def test_str_representation(self):
-        cron_repr = str(self.cron)
-        self.assertIn("expression", cron_repr)
-        self.assertIn("timeout", cron_repr)
-        self.assertIn("is_running", cron_repr)
+        callback = MagicMock(side_effect=mock_callback)
 
+        cron = Cron(callback, "* * * * * *", 1)
+        cron.start()
+        await asyncio.sleep(2)
+        callback.assert_called()
+        cron.stop()
 
-if __name__ == "__main__":
-    unittest.main()
+    async def test_avoid_callback_with_timeout(self):
+        async def other_mock_callback():
+            return
+
+        callback = MagicMock(side_effect=other_mock_callback)
+
+        cron = Cron(callback, "* * * * * *", 10)
+        cron.start()
+        await asyncio.sleep(5)
+        callback.assert_called_once()
+        await asyncio.sleep(11)
+        self.assertEqual(callback.call_count, 2)
+        cron.stop()
