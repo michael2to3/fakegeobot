@@ -4,7 +4,8 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot._commands import Schedule
 from bot._config import Config
-from bot.model import  Geolocation
+from bot.model import Geolocation
+
 
 class TestSchedule(asynctest.TestCase):
     async def test_handle(self):
@@ -14,9 +15,9 @@ class TestSchedule(asynctest.TestCase):
         update = Update(update_id=1, message=message_mock)
         context = MagicMock(spec=ContextTypes.DEFAULT_TYPE)
 
-        with patch('bot._commands.schedule.Config') as MockConfig:
+        with patch("bot._commands.schedule.Config") as MockConfig:
             config = MagicMock(spec=Config)
-            config.location = Geolocation(100,100,100)
+            config.location = Geolocation(100, 100, 100)
             config.recipient = "fake_recipient"
             config.cron_expression = "*/5 * * * *"
             config.cron_timeout = 300
@@ -27,5 +28,6 @@ class TestSchedule(asynctest.TestCase):
             await handler.handle(update, context)
             mock_handle.assert_called()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     asynctest.main()

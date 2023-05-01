@@ -33,9 +33,9 @@ class TestBot(asynctest.TestCase):
 
         update.message.text = "/start"
 
-        with patch('bot._commands.auth.Config') as MockConfig:
+        with patch("bot._commands.auth.Config") as MockConfig:
             config = MagicMock(spec=Config)
-            config.location = Geolocation(100,100,100)
+            config.location = Geolocation(100, 100, 100)
             config.recipient = "fake_recipient"
             config.cron_expression = "*/5 * * * *"
             config.cron_timeout = 300
@@ -71,5 +71,6 @@ class TestBot(asynctest.TestCase):
     def test_api_property(self):
         self.assertEqual(self.bot.api, self.api)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     asynctest.main()

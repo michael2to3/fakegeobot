@@ -12,6 +12,7 @@ from bot.bot import Bot
 from croniter import CroniterBadCronError
 from bot._config import Config
 
+
 class TestCode(asynctest.TestCase):
     def setUp(self):
         self.api = MagicMock(spec=ApiApp)
@@ -24,13 +25,13 @@ class TestCode(asynctest.TestCase):
             update = MagicMock(spec=Update)
             context = MagicMock(spec=ContextTypes.DEFAULT_TYPE)
 
-            with patch('bot._commands.code.Config') as MockConfig:
+            with patch("bot._commands.code.Config") as MockConfig:
                 config = MagicMock(spec=Config)
-                config.location = Geolocation(100,100,100)
+                config.location = Geolocation(100, 100, 100)
                 config.recipient = "fake_recipient"
                 config.cron_expression = "*/5 * * * *"
                 config.cron_timeout = 300
-                MockConfig.return_value =  config
+                MockConfig.return_value = config
                 MockConfig.return_value.api = self.api
                 code_command = Code(self.bot)
 
@@ -51,5 +52,6 @@ class TestCode(asynctest.TestCase):
         except CroniterBadCronError as e:
             self.fail(f"CroniterBadCronError raised: {e}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     asynctest.main()
