@@ -8,6 +8,10 @@ from telegram.ext import ContextTypes
 
 
 class Schedule(Command):
+    def __init__(self, bot):
+        super().__init__(bot)
+        self._config = Config()
+
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         id = update.message.chat_id
         schedule = update.message.text
@@ -41,7 +45,7 @@ class Schedule(Command):
                 cron_expression=schedule,
                 callback_timeout=user.cron.timeout
                 if user.cron is not None
-                else Config().cron_timeout,
+                else self._config.cron_timeout,
             )
 
             user.cron.start()
