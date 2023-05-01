@@ -4,9 +4,14 @@ from ..model import Session, User
 from telegram import Update
 from telegram.ext import ContextTypes
 from telethon.errors import FloodWaitError
+from .._config import Config
 
 
 class Auth(Command):
+    def __init__(self, bot):
+        super().__init__(bot)
+        self._config = Config()
+
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
 
@@ -47,7 +52,8 @@ It's need to bypass protect telegram
             auth_code=None,
             phone_code_hash=None,
         )
-        user = User(cron=None, location=None, session=info, recipient=None)
+        location = None if self._config.location is None else self._config.location
+        user = User(cron=None, location=location, session=info, recipient=None)
 
         try:
             user.session.phone_code_hash = await RequestCode.get(user, self.bot.api)
