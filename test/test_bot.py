@@ -22,9 +22,6 @@ class TestBot(asynctest.TestCase):
         self.assertEqual(self.bot._api, self.api)
         self.assertEqual(self.bot._db, self.db)
 
-
-
-
     @patch("bot._commands.Start")
     async def test_handle_command(self, MockStart):
         # Replace MagicMock with AsyncMock for Start class
@@ -54,8 +51,7 @@ class TestBot(asynctest.TestCase):
             auth_code=1234,
             phone_code_hash="1234",
         )
-        users = {1: User(cron=None, location=None,
-                         session=session, recipient="@me")}
+        users = {1: User(cron=None, location=None, session=session, recipient="@me")}
         self.bot._users = users
 
         self.assertEqual(self.bot.users, users)
