@@ -24,8 +24,12 @@ class TestBot(asynctest.TestCase):
         self.assertEqual(self.bot._db, self.db)
 
     @patch("bot._commands.Start")
-    async def test_handle_command(self, MockStart):
+    @patch("bot._commands.Auth")
+    @patch("bot._commands.Code")
+    async def test_handle_command(self, MockStart, MockAuth, MockCode):
         MockStart.return_value = AsyncMock()
+        MockAuth.return_value = AsyncMock()
+        MockCode.return_value = AsyncMock()
 
         update = MagicMock(spec=Update)
         update.message.reply_text = AsyncMock()
@@ -33,16 +37,8 @@ class TestBot(asynctest.TestCase):
 
         update.message.text = "/start"
 
-        with patch("bot._commands.auth.Config") as MockConfig:
-            config = MagicMock(spec=Config)
-            config.api = ApiApp(api_id=1, api_hash="fake_hash")
-            config.location = Geolocation(100, 100, 100)
-            config.recipient = "fake_recipient"
-            config.cron_expression = "*/5 * * * *"
-            config.cron_timeout = 300
-            MockConfig.return_value = config
-            await self.bot._handle_command("start", update, context)
-            await MockStart.return_value.handle(update, context)
+        await self.bot._handle_command("start", update, context)
+        await MockStart.return_value.handle(update, context)
 
         MockStart.return_value.handle.assert_called_once_with(update, context)
         MockStart.reset_mock()
