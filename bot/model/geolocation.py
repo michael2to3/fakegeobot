@@ -57,3 +57,10 @@ class Geolocation:
 
     def __str__(self):
         return f"Geolocation(lat={self._lat}, long={self._long}, interval={self._interval})"
+
+    def __eq__(self, other):
+        return (
+            self._lat == other._lat
+            and self._long == other._long
+            and self._interval == other._interval
+        )
