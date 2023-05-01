@@ -1,16 +1,16 @@
 import asynctest
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import MagicMock, AsyncMock, patch
 
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from bot._commands import Code
 from bot._cron import Cron
-from bot.model import ApiApp, User
+from bot.model import ApiApp, User, Geolocation
 from bot._db import DatabaseHandler
 from bot.bot import Bot
 from croniter import CroniterBadCronError
-
+from bot._config import Config
 
 class TestCode(asynctest.TestCase):
     def setUp(self):
@@ -23,7 +23,16 @@ class TestCode(asynctest.TestCase):
         try:
             update = MagicMock(spec=Update)
             context = MagicMock(spec=ContextTypes.DEFAULT_TYPE)
-            code_command = Code(self.bot)
+
+            with patch('bot._commands.code.Config') as MockConfig:
+                config = MagicMock(spec=Config)
+                config.location = Geolocation(100,100,100)
+                config.recipient = "fake_recipient"
+                config.cron_expression = "*/5 * * * *"
+                config.cron_timeout = 300
+                MockConfig.return_value =  config
+                MockConfig.return_value.api = self.api
+                code_command = Code(self.bot)
 
             update.message.chat_id = 1
             update.message.text = "/code 1.2.3.4.5"
@@ -41,3 +50,6 @@ class TestCode(asynctest.TestCase):
             update.message.reply_text.assert_called()
         except CroniterBadCronError as e:
             self.fail(f"CroniterBadCronError raised: {e}")
+
+if __name__ == '__main__':
+    asynctest.main()

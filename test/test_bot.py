@@ -6,8 +6,9 @@ from telegram.ext import ContextTypes
 
 from bot._db import DatabaseHandler
 from bot.bot import Bot
-from bot.model import ApiApp, Session, User
+from bot.model import ApiApp, Session, User, Geolocation
 from bot._commands import Start
+from bot._config import Config
 
 
 class TestBot(asynctest.TestCase):
@@ -24,7 +25,6 @@ class TestBot(asynctest.TestCase):
 
     @patch("bot._commands.Start")
     async def test_handle_command(self, MockStart):
-        # Replace MagicMock with AsyncMock for Start class
         MockStart.return_value = AsyncMock()
 
         update = MagicMock(spec=Update)
@@ -32,8 +32,17 @@ class TestBot(asynctest.TestCase):
         context = MagicMock(spec=ContextTypes.DEFAULT_TYPE)
 
         update.message.text = "/start"
-        await self.bot._handle_command("start", update, context)
-        await MockStart.return_value.handle(update, context)
+
+        with patch('bot._commands.auth.Config') as MockConfig:
+            config = MagicMock(spec=Config)
+            config.location = Geolocation(100,100,100)
+            config.recipient = "fake_recipient"
+            config.cron_expression = "*/5 * * * *"
+            config.cron_timeout = 300
+            MockConfig.return_value = config
+            await self.bot._handle_command("start", update, context)
+            await MockStart.return_value.handle(update, context)
+
         MockStart.return_value.handle.assert_called_once_with(update, context)
         MockStart.reset_mock()
 
@@ -61,3 +70,6 @@ class TestBot(asynctest.TestCase):
 
     def test_api_property(self):
         self.assertEqual(self.bot.api, self.api)
+
+if __name__ == '__main__':
+    asynctest.main()
