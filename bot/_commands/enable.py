@@ -17,6 +17,6 @@ class Enable(Command):
             self.logger.info(f"User {chat_id} not initialized cron")
             return
 
-        self.bot.users[chat_id].cron.start()
+        user.cron.start()
 
         await update.message.reply_text("Your account is enable")
