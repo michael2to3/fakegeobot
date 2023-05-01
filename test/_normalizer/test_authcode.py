@@ -1,10 +1,9 @@
 import unittest
 
-from bot._normalizer.auth_code import AuthCode
+from bot._normalizer.authcode import AuthCode
 
 
 class TestAuthCode(unittest.TestCase):
-
     def test_normalize_valid_code(self):
         input_text = "Your code is 12345."
         expected_output = "12345"
@@ -32,5 +31,5 @@ class TestAuthCode(unittest.TestCase):
         self.assertEqual(result, expected_output)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
