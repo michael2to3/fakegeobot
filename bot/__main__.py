@@ -23,7 +23,8 @@ def get_root_path():
 
 def generate_bot():
     config = Config()
-    db = DatabaseHandler(config.db_path, config.db_name, config.api)
+    uri = f"sqlite:///{config.db_path}{config.db_name}"
+    db = DatabaseHandler(config.api, uri)
     return Bot(config.api, config.bot_token, db)
 
 
