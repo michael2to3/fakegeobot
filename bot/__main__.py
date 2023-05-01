@@ -21,15 +21,13 @@ def get_root_path():
     return os.path.join(root, "..")
 
 
-def generate_bot():
-    config = Config()
-    uri = f"sqlite:///{config.db_path}{config.db_name}"
-    db = DatabaseHandler(config.api, uri)
+def generate_bot(config: Config):
+    db = DatabaseHandler(config.api, config.db_uri)
     return Bot(config.api, config.bot_token, db)
 
 
-def start_bot():
-    bot = generate_bot()
+def start_bot(config: Config):
+    bot = generate_bot(config)
     bot.run()
 
 
@@ -44,9 +42,10 @@ def start_cron():
 
 
 def main():
+    config = Config()
     setup_logging()
     cron_process = multiprocessing.Process(target=start_cron)
-    bot_process = multiprocessing.Process(target=start_bot)
+    bot_process = multiprocessing.Process(target=lambda: start_bot(config))
     cron_process.start()
     bot_process.start()
 
