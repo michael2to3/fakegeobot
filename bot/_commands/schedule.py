@@ -29,39 +29,24 @@ class Schedule(Command):
             return
 
         emess = "Done!"
-        try:
-            if user.cron is None:
-                user.cron = Cron(
-                    callback=Fakelocation(
-                        self.bot.api, user.session, user.location, user.recipient
-                    ).execute,
-                    expression=schedule,
-                    timeout=-1,
-                )
-                await user.cron.start()
+        if user.cron is not None:
+            user.cron.stop()
 
-            elif user.cron is not None and user.cron.expression != schedule:
-                await user.cron.stop()
-                user.cron = Cron(
-                    callback=Fakelocation(
-                        self.bot.api, user.session, user.location, user.recipient
-                    ).execute,
-                    expression=schedule,
-                    timeout=-1,
-                )
-                await user.cron.start()
+        try:
+            user.cron = Cron(
+                callback=Fakelocation(
+                    self.bot.api, user.session, user.location, user.recipient
+                ).execute,
+                expression=schedule,
+            )
+
+            user.cron.start()
         except CroniterNotAlphaError as e:
             self.logger.error(str(e))
             emess = "Error, schedule not change"
         except CroniterBadCronError as e:
             self.logger.error(str(e))
             emess = "Not valid range"
-        except ValueError as e:
-            self.logger.error(str(e))
-            emess = str(e)
-        except Exception as e:
-            emess = "Oops unknown error"
-            self.logger.error(e)
         else:
             self.bot.db.save_user(self.bot.users[id])
 
