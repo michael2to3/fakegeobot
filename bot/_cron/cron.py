@@ -1,10 +1,9 @@
 import asyncio
 import logging
 import time
-from typing import Any, Callable, Coroutine, List
-
-import schedule
+from typing import Any, Callable, Coroutine
 from croniter import croniter
+from .._config import Config
 
 
 class FloodException(BaseException):
@@ -15,52 +14,34 @@ class FloodException(BaseException):
 
 
 class Cron:
-    __slots__ = ("_logger", "_callback", "_expression", "_timeout", "_job")
+    __slots__ = (
+        "_logger",
+        "_callback",
+        "_expression",
+        "_timeout",
+        "_job",
+        "_last_callback_time",
+    )
 
     _logger: logging.Logger
     _callback: Callable[[], Coroutine[Any, Any, None]]
     _expression: str
     _timeout: int
     _job: Any
+    _last_callback_time: float
 
     def __init__(
         self,
         callback: Callable[[], Coroutine[Any, Any, None]],
         expression: str,
-        timeout: int,
+        timeout: int | None = None,
     ):
         self._logger = logging.getLogger(__name__)
         self._callback = callback
         self._expression = expression
-        self._timeout = timeout
-        self.validate_expression()
+        self._timeout = timeout if timeout is not None else Config().cron_timeout
         self._job = None
-
-    def validate_expression(self):
-        cron_parts = self._expression.split()
-        if len(cron_parts) < 5:
-            raise ValueError("Invalid cron expression")
-
-        mins: str = cron_parts[0]
-        if mins == "*":
-            raise FloodException("Cron schedule is too frequent")
-
-        if "-" in mins or "," in mins or "/" in mins:
-            min_values: List[int] = []
-            if "-" in mins:
-                min_range: List[int] = list(map(int, mins.split("-")))
-                min_values = list(range(min_range[0], min_range[1] + 1))
-            elif "," in mins:
-                min_values = list(map(int, mins.split(",")))
-            elif "/" in mins:
-                min_step: int = int(mins.split("/")[1])
-                min_values = list(range(0, 60, min_step))
-
-            if any(
-                t2 - t1 < self._timeout / 60
-                for t1, t2 in zip(min_values, min_values[1:])
-            ):
-                raise FloodException("Cron schedule is too frequent")
+        self._last_callback_time = 0
 
     def start(self):
         self._logger.info("Starting cron")
@@ -75,7 +56,15 @@ class Cron:
         while True:
             next_run = iter.get_next(float)
             await asyncio.sleep(next_run - time.time())
-            await self._async_callback_wrapper()
+            current_time = time.time()
+            if current_time - self._last_callback_time >= self._timeout:
+                self._logger.info("Scheduling callback")
+                await self._async_callback_wrapper()
+                self._last_callback_time = current_time
+            else:
+                self._logger.info(
+                    f"Sleeping {self._timeout - (current_time - self._last_callback_time)} seconds"
+                )
 
     async def _async_callback_wrapper(self):
         self._logger.info("Start callback in cron")
