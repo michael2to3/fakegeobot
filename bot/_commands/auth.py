@@ -53,7 +53,8 @@ It's need to bypass protect telegram
             phone_code_hash=None,
         )
         location = None if self._config.location is None else self._config.location
-        user = User(cron=None, location=location, session=info, recipient=None)
+        recipient = None if self._config.recipient is None else self._config.recipient
+        user = User(cron=None, location=location, session=info, recipient=recipient)
 
         try:
             user.session.phone_code_hash = await RequestCode.get(user, self.bot.api)
