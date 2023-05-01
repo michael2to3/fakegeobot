@@ -35,6 +35,7 @@ class TestBot(asynctest.TestCase):
 
         with patch("bot._commands.auth.Config") as MockConfig:
             config = MagicMock(spec=Config)
+            config.api = ApiApp(api_id=1, api_hash="fake_hash")
             config.location = Geolocation(100, 100, 100)
             config.recipient = "fake_recipient"
             config.cron_expression = "*/5 * * * *"
