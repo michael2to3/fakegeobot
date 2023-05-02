@@ -75,6 +75,9 @@ class Cron:
     def __str__(self) -> str:
         return f"Cron(expression={self._cron_expression}, timeout={self._callback_timeout}, is_running={self.is_running()})"
 
+    def __del__(self):
+        self.stop()
+
     @property
     def expression(self) -> str:
         return self._cron_expression
