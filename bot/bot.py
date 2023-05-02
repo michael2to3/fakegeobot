@@ -75,8 +75,8 @@ class Bot(AbstractBot):
 
                 await update.message.reply_text(t("connection_error", update, self._users))
             except ValueError as e:
-                self.logger.error(t("value_error", lang))
-                await update.message.reply_text(f"ValueError: {e}")
+                self.logger.error(f"ValueError: {e}")
+                await update.message.reply_text(t("value_error", update, self._users))
             except OperationalError as e:
                 error_traceback = traceback.format_exc()
                 self.logger.error(

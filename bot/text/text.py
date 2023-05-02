@@ -9,11 +9,16 @@ locales_dir = os.path.join(os.path.dirname(__file__), "locales")
 
 class Text:
     @staticmethod
-    def usertext(text: str, language: str) -> str:
+    def langtext(text: str, language: str) -> str:
         lang = gettext.translation(
             "messages", locales_dir, languages=[language, "en"], fallback=True
         )
         return lang.gettext(text)
+
+    @staticmethod
+    def usertext(text: str, update: Update, users: Dict[int, User]) -> str:
+        lang = Text._get_lang(update, users)
+        return Text.langtext(text, lang)
 
     @staticmethod
     def _get_lang(update: Update, users: Dict[int, User]) -> str:
