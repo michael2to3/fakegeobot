@@ -1,3 +1,4 @@
-from .text import usertext
+from .text import Text
 
-__all__ = ["usertext"]
+usertext = Text.usertext
+__all__ = ["Text", "usertext"]

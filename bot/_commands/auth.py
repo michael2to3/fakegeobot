@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telethon.errors import FloodWaitError
 from .._config import Config
-from gettext import gettext as t
+from ..text import usertext as t
 
 
 class Auth(Command):
@@ -18,7 +18,7 @@ class Auth(Command):
 
         if chat_id in self.bot.users:
             await update.message.reply_text(
-                t("user_already_registered"), parse_mode="Markdown"
+                t("user_already_registered", update, self.bot.users), parse_mode="Markdown"
             )
             return
 

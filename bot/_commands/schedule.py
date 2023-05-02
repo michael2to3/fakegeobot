@@ -5,7 +5,7 @@ from .._config import Config
 from croniter.croniter import CroniterBadCronError, CroniterNotAlphaError
 from telegram import Update
 from telegram.ext import ContextTypes
-from gettext import gettext as t
+from ..text import usertext as t
 
 
 class Schedule(Command):

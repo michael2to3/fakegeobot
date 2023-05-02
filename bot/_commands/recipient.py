@@ -3,7 +3,7 @@ from .._config import Config
 from ..model import Geolocation
 from telegram import Update
 from telegram.ext import ContextTypes
-from gettext import gettext as t
+from ..text import usertext as t
 
 
 class Recipient(Command):

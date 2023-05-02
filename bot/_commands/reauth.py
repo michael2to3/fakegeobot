@@ -5,7 +5,7 @@ from .._user import RequestCode
 from telegram import Update
 from telegram.ext import ContextTypes
 from telethon.errors import FloodWaitError
-from gettext import gettext as t
+from ..text import usertext as t
 
 
 class Reauth(Command):

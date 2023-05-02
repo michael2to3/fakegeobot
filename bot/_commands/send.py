@@ -3,7 +3,7 @@ from .._commands import Command
 from telegram import Update
 from telegram.ext import ContextTypes
 from telethon.errors import AuthKeyUnregisteredError
-from gettext import gettext as t
+from ..text import usertext as t
 
 
 class Send(Command):

@@ -1,7 +1,7 @@
 from .command import Command
 from telegram import Update
 from telegram.ext import ContextTypes
-from gettext import gettext as t
+from ..text import usertext as t
 
 
 class Disable(Command):

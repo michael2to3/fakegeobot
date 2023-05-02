@@ -2,7 +2,7 @@ import logging
 import traceback
 from sqlite3 import OperationalError
 from typing import Dict
-from gettext import gettext as t
+from .text import usertext as t
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
@@ -72,25 +72,26 @@ class Bot(AbstractBot):
                 await handler.handle(update, context)
             except ConnectionError as e:
                 self.logger.error(f"ConnectionError: {e}")
-                await update.message.reply_text(t("connection_error"))
+
+                await update.message.reply_text(t("connection_error", update, self._users))
             except ValueError as e:
-                self.logger.error(t("value_error"))
+                self.logger.error(t("value_error", lang))
                 await update.message.reply_text(f"ValueError: {e}")
             except OperationalError as e:
                 error_traceback = traceback.format_exc()
                 self.logger.error(
                     f"Error while handling the command: {command}, {e}\n{error_traceback}"
                 )
-                await update.message.reply_text(t("database_error"))
+                await update.message.reply_text(t("database_error", lang))
             except Exception as e:
                 error_traceback = traceback.format_exc()
                 self.logger.error(
                     f"Error while handling the command: {command}, {e}\n{error_traceback}"
                 )
-                await update.message.reply_text(t("unknown_error"))
+                await update.message.reply_text(t("unknown_error", lang))
         else:
             self.logger.warn(f"Unknown command: {command}")
-            await update.message.reply_text(t("unknown_command").format(command))
+            await update.message.reply_text(t("unknown_command", lang).format(command))
 
     def run(self) -> None:
         app = self._app
