@@ -13,9 +13,9 @@ class Schedule(Command):
         self._config = Config()
 
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        id = update.message.chat_id
+        chat_id = update.message.chat_id
         schedule = update.message.text
-        user = self.bot.users[id]
+        user = self.bot.users[chat_id]
 
         if schedule.find(" ") == -1:
             await update.message.reply_text(
@@ -56,6 +56,6 @@ class Schedule(Command):
             self.logger.error(str(e))
             emess = "Not valid range"
         else:
-            self.bot.db.save_user(self.bot.users[id])
+            self.bot.db.save_user(self.bot.users[chat_id])
 
         await update.message.reply_text(emess)
