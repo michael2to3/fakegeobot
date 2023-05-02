@@ -1,5 +1,6 @@
 aiocron==1.8
 anyio==3.6.2
+asynctest==0.13.0
 certifi==2022.12.7
 croniter==1.3.14
 greenlet==2.0.2
@@ -17,11 +18,18 @@ python-telegram-bot==20.0
 pytz-deprecation-shim==0.1.0.post0
 rfc3986==1.5.0
 rsa==4.9
+schedule==1.2.0
 six==1.16.0
 sniffio==1.3.0
 SQLAlchemy==2.0.11
 Telethon==1.27.0
 tomli==2.0.1
+types-cachetools==5.3.0.5
+types-croniter==1.3.2.9
+types-docutils==0.19.1.8
+types-Pygments==2.15.0.0
+types-pytz==2023.3.0.0
+types-setuptools==67.7.0.0
 typing_extensions==4.5.0
 tzdata==2023.3
 tzlocal==4.3

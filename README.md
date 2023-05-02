@@ -20,7 +20,7 @@ This bot was created to help users bypass location checks in various application
   2. Log in using your Telegram account
   3. Click on `API Development Tools`
   4. Fill in the required fields and create your API client
-  5. Replace `YOUR_API_ID` and `YOUR_API_HASH` in the `docker-copose.yml` or `main.py`
+  5. Replace `YOUR_API_ID` and `YOUR_API_HASH` in the `.env` or `system properties`
 
 ## Usage
 1. Clone this repository
