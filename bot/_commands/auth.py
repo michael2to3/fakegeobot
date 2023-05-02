@@ -39,7 +39,7 @@ class Auth(Command):
             )
             return
 
-        emess = t("auth_code_sent")
+        emess = t("auth_code_sent", update, self.bot.users)
 
         info = Session(
             session_name=str(chat_id),
@@ -65,10 +65,10 @@ class Auth(Command):
             user.session.phone_code_hash = await RequestCode.get(user, self.bot.api)
         except RuntimeError as e:
             self.logger.error(e)
-            emess = t("auth_code_not_sent")
+            emess = t("auth_code_not_sent", update, self.bot.users)
         except FloodWaitError as e:
             self.logger.error(e)
-            emess = t("flood_wait_error")
+            emess = t("flood_wait_error", update, self.bot.users)
         else:
             self.bot.users[chat_id] = user
             self.bot.db.save_user(user)

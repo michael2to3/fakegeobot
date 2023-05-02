@@ -37,4 +37,6 @@ class Language(Command):
             )
             return
 
+        self.bot.users[chat_id].language = lang
+        self.bot.db.save_user(user)
         await update.message.reply_text(t("language_set", update, self.bot.users))

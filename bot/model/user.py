@@ -12,13 +12,13 @@ class User:
         location: Geolocation | None,
         session: Session,
         recipient: str | None,
-        language: str | None = None,
+        language: str,
     ):
         self._cron = cron
         self._location = location
         self._session = session
         self._recipient = recipient
-        self._language = language if language is not None else "en"
+        self._language = language
 
     @property
     def cron(self):
@@ -61,4 +61,4 @@ class User:
         self._language = value
 
     def __str__(self):
-        return f"User(cron={self.cron}, location={self.location}, session={self.session}, recipient={self.recipient})"
+        return f"User(cron={self.cron}, location={self.location}, session={self.session}, recipient={self.recipient}), language={self.language}"

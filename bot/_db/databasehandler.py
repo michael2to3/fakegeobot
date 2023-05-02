@@ -27,6 +27,7 @@ class UserRecord(Base):
     auth_code = Column(Integer)
     recipient = Column(String, nullable=True)
     phone_code_hash = Column(String)
+    language = Column(String)
 
 
 class DatabaseHandler:
@@ -74,6 +75,7 @@ class DatabaseHandler:
             auth_code=user.session.auth_code,
             recipient=user.recipient,
             phone_code_hash=user.session.phone_code_hash,
+            language=user.language,
         )
 
         with self._get_session() as db_session:
@@ -123,6 +125,7 @@ class DatabaseHandler:
     def _user_from_record(self, user_record: UserRecord) -> User:
         chat_id = cast(Optional[int], user_record.chat_id)
         auth_code = cast(Optional[int], user_record.auth_code)
+        language = cast(str, user_record.language)
 
         if chat_id is None:
             raise ValueError("User not found")
@@ -159,7 +162,7 @@ class DatabaseHandler:
         else:
             cron = None
 
-        user = User(cron, location, session, recipient)
+        user = User(cron, location, session, recipient, language)
         return user
 
     @contextmanager
