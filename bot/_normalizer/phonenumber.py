@@ -6,7 +6,6 @@ class PhoneNumber(Normalizer):
     @staticmethod
     def normalize(text: str) -> str:
         phone = PhoneNumber._remove_junk(text.strip())
-        has_plus = phone.startswith("+")
         phone = re.sub(r"\D", "", phone)
 
         if len(phone) < 10 or len(phone) > 13:
