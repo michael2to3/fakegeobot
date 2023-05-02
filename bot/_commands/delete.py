@@ -12,6 +12,6 @@ class Delete(Command):
             del self.bot.users[chat_id]
         except KeyError as e:
             self.logger.error(str(e))
-            await update.message.reply_text(t("user_not_found"))
+            await update.message.reply_text(t("user_not_found", update, self.bot.users))
             return
-        await update.message.reply_text(t("user_deleted"))
+        await update.message.reply_text(t("user_deleted", update, self.bot.users))

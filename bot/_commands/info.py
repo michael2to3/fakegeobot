@@ -10,7 +10,7 @@ class Info(Command):
 
         if chat_id not in self.bot.users:
             self.logger.warn(f"User not found: {chat_id}")
-            await update.message.reply_text(t("user_not_found"))
+            await update.message.reply_text(t("user_not_found", update, self.bot.users))
             return
 
         user = self.bot.users[chat_id]

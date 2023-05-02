@@ -10,7 +10,7 @@ class Location(Command):
         chat_id = update.message.chat_id
         if chat_id not in self.bot.users:
             self.logger.warn(f"User not found: {chat_id}")
-            await update.message.reply_text(t("user_not_found"))
+            await update.message.reply_text(t("user_not_found", update, self.bot.users))
             return
 
         location = None
@@ -19,7 +19,9 @@ class Location(Command):
         else:
             if update.message.text.count(" ") <= 1:
                 await update.message.reply_text(
-                    t("location_show").format(self.bot.users[chat_id].location)
+                    t("location_show", update, self.bot.users).format(
+                        self.bot.users[chat_id].location
+                    )
                 )
                 return
             location = self._from_text(update)

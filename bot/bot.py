@@ -20,6 +20,7 @@ from ._commands import (
     Schedule,
     Send,
     Start,
+    Language,
 )
 from ._db import DatabaseHandler
 from .abstract_bot import AbstractBot
@@ -64,6 +65,7 @@ class Bot(AbstractBot):
             "recipient": Recipient(self),
             "reauth": Reauth(self),
             "info": Info(self),
+            "language": Language(self),
         }
 
         handler = handlers.get(command)
@@ -73,7 +75,9 @@ class Bot(AbstractBot):
             except ConnectionError as e:
                 self.logger.error(f"ConnectionError: {e}")
 
-                await update.message.reply_text(t("connection_error", update, self._users))
+                await update.message.reply_text(
+                    t("connection_error", update, self._users)
+                )
             except ValueError as e:
                 self.logger.error(f"ValueError: {e}")
                 await update.message.reply_text(t("value_error", update, self._users))
@@ -82,16 +86,20 @@ class Bot(AbstractBot):
                 self.logger.error(
                     f"Error while handling the command: {command}, {e}\n{error_traceback}"
                 )
-                await update.message.reply_text(t("database_error", lang))
+                await update.message.reply_text(
+                    t("database_error", update, self._users)
+                )
             except Exception as e:
                 error_traceback = traceback.format_exc()
                 self.logger.error(
                     f"Error while handling the command: {command}, {e}\n{error_traceback}"
                 )
-                await update.message.reply_text(t("unknown_error", lang))
+                await update.message.reply_text(t("unknown_error", update, self._users))
         else:
             self.logger.warn(f"Unknown command: {command}")
-            await update.message.reply_text(t("unknown_command", lang).format(command))
+            await update.message.reply_text(
+                t("unknown_command", update, self._users).format(command)
+            )
 
     def run(self) -> None:
         app = self._app
@@ -109,6 +117,7 @@ class Bot(AbstractBot):
             "recipient",
             "reauth",
             "info",
+            "language",
         ]
 
         for command in commands:

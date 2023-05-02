@@ -29,11 +29,11 @@ class Schedule(Command):
         schedule = " ".join(schedule.split(" ")[1:])
 
         if user.location is None:
-            await update.message.reply_text(t("need_location"))
+            await update.message.reply_text(t("need_location", update, self.bot.users))
             return
 
         if user.recipient is None:
-            await update.message.reply_text(t("need_recipient"))
+            await update.message.reply_text(t("need_recipient", update, self.bot.users))
             return
 
         emess = t("cron_set_schedule")

@@ -14,10 +14,14 @@ class Send(Command):
             user = self.bot.users[chat_id]
 
             if user.location is None:
-                await update.message.reply_text(t("need_location"))
+                await update.message.reply_text(
+                    t("need_location", update, self.bot.users)
+                )
                 return
             if user.recipient is None:
-                await update.message.reply_text(t("need_recipient"))
+                await update.message.reply_text(
+                    t("need_recipient", update, self.bot.users)
+                )
                 return
 
             action = Fakelocation(

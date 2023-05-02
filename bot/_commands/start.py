@@ -6,4 +6,4 @@ from ..text import usertext as t
 
 class Start(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        await update.message.reply_text(t("start"))
+        await update.message.reply_text(t("start", update, self.bot.users))

@@ -18,7 +18,8 @@ class Auth(Command):
 
         if chat_id in self.bot.users:
             await update.message.reply_text(
-                t("user_already_registered", update, self.bot.users), parse_mode="Markdown"
+                t("user_already_registered", update, self.bot.users),
+                parse_mode="Markdown",
             )
             return
 
@@ -27,11 +28,15 @@ class Auth(Command):
             username = update.message.from_user.full_name
 
         if update.message.text.count(" ") < 1:
-            await update.message.reply_text(t("enter_auth_code"), parse_mode="Markdown")
+            await update.message.reply_text(
+                t("enter_auth_code", update, self.bot.users), parse_mode="Markdown"
+            )
             return
         phone = update.message.text.split(" ")[1]
         if phone is None:
-            await update.message.reply_text(t("enter_phone"), parse_mode="Markdown")
+            await update.message.reply_text(
+                t("enter_phone", update, self.bot.users), parse_mode="Markdown"
+            )
             return
 
         emess = t("auth_code_sent")

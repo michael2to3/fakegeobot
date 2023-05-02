@@ -19,11 +19,15 @@ class Code(Command):
         chat_id = update.message.chat_id
 
         if auth_code is None:
-            await update.message.reply_text(t("enter_auth_code"), parse_mode="Markdown")
+            await update.message.reply_text(
+                t("enter_auth_code", update, self.bot.users), parse_mode="Markdown"
+            )
             return
         if chat_id not in self.bot.users:
             self.logger.warn(f"User not found: {chat_id}")
-            await update.message.reply_text(t("user_not_found"), parse_mode="Markdown")
+            await update.message.reply_text(
+                t("user_not_found", update, self.bot.users), parse_mode="Markdown"
+            )
             return
 
         user = self.bot.users[chat_id]
@@ -33,7 +37,9 @@ class Code(Command):
         user.cron.start()
         self.bot.db.save_user(user)
         self.bot.users[chat_id] = user
-        await update.message.reply_text(t("success"), parse_mode="Markdown")
+        await update.message.reply_text(
+            t("success", update, self.bot.users), parse_mode="Markdown"
+        )
 
     def _get_cron(self, user: User):
         location = self._config.location

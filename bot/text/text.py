@@ -26,5 +26,9 @@ class Text:
         if chat_id in users:
             return users[chat_id].language
         else:
-            language_code = update.message.from_user.language_code if update.message.from_user.language_code else "en"
+            language_code = (
+                update.message.from_user.language_code
+                if update.message.from_user.language_code
+                else "en"
+            )
             return language_code.split("_")[0]
