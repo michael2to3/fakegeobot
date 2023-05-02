@@ -1,24 +1,28 @@
-import gettext
 import os
+import polib
 from typing import Dict
 from ..model import User
 from telegram import Update
 
-locales_dir = os.path.join(os.path.dirname(__file__), "locales")
-
 
 class Text:
-    @staticmethod
-    def langtext(text: str, language: str) -> str:
-        lang = gettext.translation(
-            "messages", locales_dir, languages=[language, "en"], fallback=True
-        )
-        return lang.gettext(text)
+    _cache = {}
 
     @staticmethod
     def usertext(text: str, update: Update, users: Dict[int, User]) -> str:
+        localedir = os.path.join(os.path.dirname(__file__), '..', 'locales')
         lang = Text._get_lang(update, users)
-        return Text.langtext(text, lang)
+
+        if lang not in Text._cache:
+            po_filepath = os.path.join(localedir, lang, 'LC_MESSAGES', 'messages.po')
+            Text._cache[lang] = polib.pofile(po_filepath)
+
+        po = Text._cache[lang]
+        entry = po.find(text)
+        if entry and entry.msgstr:
+            return entry.msgstr
+        else:
+            return text
 
     @staticmethod
     def _get_lang(update: Update, users: Dict[int, User]) -> str:
