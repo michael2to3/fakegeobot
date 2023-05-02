@@ -1,6 +1,7 @@
 from .command import Command
 from telegram import Update
 from telegram.ext import ContextTypes
+from gettext import gettext as t
 
 
 class Info(Command):
@@ -9,7 +10,7 @@ class Info(Command):
 
         if chat_id not in self.bot.users:
             self.logger.warn(f"User not found: {chat_id}")
-            await update.message.reply_text("User not found")
+            await update.message.reply_text(t("user_not_found"))
             return
 
         user = self.bot.users[chat_id]

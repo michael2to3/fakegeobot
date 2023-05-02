@@ -3,6 +3,7 @@ from .._config import Config
 from ..model import Geolocation
 from telegram import Update
 from telegram.ext import ContextTypes
+from gettext import gettext as t
 
 
 class Recipient(Command):
@@ -10,17 +11,17 @@ class Recipient(Command):
         chat_id = update.message.chat_id
         if chat_id not in self.bot.users:
             self.logger.warn(f"User not found: {chat_id}")
-            await update.message.reply_text("User not found")
+            await update.message.reply_text(t("user_not_found"))
             return
 
         if update.message.text.count(" ") < 1:
             await update.message.reply_text(
-                f"Your recipient: {self.bot.users[chat_id].recipient}"
+                t("recipient_not_specified"),
             )
             return
         username = update.message.text.split(" ")[1]
         if not username:
-            await update.message.reply_text("Please enter username")
+            await update.message.reply_text(t("recipient_not_change_username"))
             return
 
         self.bot.users[chat_id].recipient = username

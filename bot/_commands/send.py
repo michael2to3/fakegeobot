@@ -3,6 +3,7 @@ from .._commands import Command
 from telegram import Update
 from telegram.ext import ContextTypes
 from telethon.errors import AuthKeyUnregisteredError
+from gettext import gettext as t
 
 
 class Send(Command):
@@ -13,10 +14,10 @@ class Send(Command):
             user = self.bot.users[chat_id]
 
             if user.location is None:
-                await update.message.reply_text("Need change location")
+                await update.message.reply_text(t("need_location"))
                 return
             if user.recipient is None:
-                await update.message.reply_text("Need change recipient")
+                await update.message.reply_text(t("need_recipient"))
                 return
 
             action = Fakelocation(

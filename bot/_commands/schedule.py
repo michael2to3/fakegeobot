@@ -5,6 +5,7 @@ from .._config import Config
 from croniter.croniter import CroniterBadCronError, CroniterNotAlphaError
 from telegram import Update
 from telegram.ext import ContextTypes
+from gettext import gettext as t
 
 
 class Schedule(Command):
@@ -19,21 +20,23 @@ class Schedule(Command):
 
         if schedule.find(" ") == -1:
             await update.message.reply_text(
-                f"Your schedule {user.cron.expression if user.cron is not None else None}"
+                t("cron_show_expression").format(
+                    user.cron.expression if user.cron is not None else "None"
+                )
             )
             return
 
         schedule = " ".join(schedule.split(" ")[1:])
 
         if user.location is None:
-            await update.message.reply_text("Need change location")
+            await update.message.reply_text(t("need_location"))
             return
 
         if user.recipient is None:
-            await update.message.reply_text("Need change recipient")
+            await update.message.reply_text(t("need_recipient"))
             return
 
-        emess = "Done!"
+        emess = t("cron_set_schedule")
         if user.cron is not None:
             user.cron.stop()
 
@@ -49,12 +52,9 @@ class Schedule(Command):
             )
 
             user.cron.start()
-        except CroniterNotAlphaError as e:
+        except CroniterNotAlphaError | CroniterBadCronError as e:
             self.logger.error(str(e))
-            emess = "Error, schedule not change"
-        except CroniterBadCronError as e:
-            self.logger.error(str(e))
-            emess = "Not valid range"
+            emess = t("cron_invalid_expression")
         else:
             self.bot.db.save_user(self.bot.users[chat_id])
 

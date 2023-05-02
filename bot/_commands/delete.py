@@ -1,6 +1,7 @@
 from .command import Command
 from telegram import Update
 from telegram.ext import ContextTypes
+from gettext import gettext as t
 
 
 class Delete(Command):
@@ -11,6 +12,6 @@ class Delete(Command):
             del self.bot.users[chat_id]
         except KeyError as e:
             self.logger.error(str(e))
-            await update.message.reply_text("Your token is not registered")
+            await update.message.reply_text(t("user_not_found"))
             return
-        await update.message.reply_text("Your account was deleted!")
+        await update.message.reply_text(t("user_deleted"))

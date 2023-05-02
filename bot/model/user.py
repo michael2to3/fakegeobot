@@ -4,7 +4,7 @@ from .session import Session
 
 
 class User:
-    __slots__ = ("_cron", "_location", "_session", "_recipient")
+    __slots__ = ("_cron", "_location", "_session", "_recipient", "_language")
 
     def __init__(
         self,
@@ -12,11 +12,13 @@ class User:
         location: Geolocation | None,
         session: Session,
         recipient: str | None,
+        language: str | None = None,
     ):
         self._cron = cron
         self._location = location
         self._session = session
         self._recipient = recipient
+        self._language = language if language is not None else "en"
 
     @property
     def cron(self):
@@ -49,6 +51,14 @@ class User:
     @recipient.setter
     def recipient(self, value):
         self._recipient = value
+
+    @property
+    def language(self):
+        return self._language
+
+    @language.setter
+    def language(self, value):
+        self._language = value
 
     def __str__(self):
         return f"User(cron={self.cron}, location={self.location}, session={self.session}, recipient={self.recipient})"

@@ -6,6 +6,7 @@ from .._action import Fakelocation
 from .._normalizer import AuthCode
 from telegram import Update
 from telegram.ext import ContextTypes
+from gettext import gettext as t
 
 
 class Code(Command):
@@ -18,11 +19,11 @@ class Code(Command):
         chat_id = update.message.chat_id
 
         if auth_code is None:
-            await update.message.reply_text("Please enter auth code")
+            await update.message.reply_text(t("enter_auth_code"), parse_mode="Markdown")
             return
         if chat_id not in self.bot.users:
             self.logger.warn(f"User not found: {chat_id}")
-            await update.message.reply_text("User not found")
+            await update.message.reply_text(t("user_not_found"), parse_mode="Markdown")
             return
 
         user = self.bot.users[chat_id]
@@ -32,7 +33,7 @@ class Code(Command):
         user.cron.start()
         self.bot.db.save_user(user)
         self.bot.users[chat_id] = user
-        await update.message.reply_text("Success! Code complete!")
+        await update.message.reply_text(t("success"), parse_mode="Markdown")
 
     def _get_cron(self, user: User):
         location = self._config.location
