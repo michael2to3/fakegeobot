@@ -16,7 +16,7 @@ class Recipient(Command):
 
         if update.message.text.count(" ") < 1:
             await update.message.reply_text(
-                t("recipient_not_specified"),
+                t("recipient_not_specified", update, self.bot.users),
             )
             return
         username = update.message.text.split(" ")[1]
@@ -28,7 +28,7 @@ class Recipient(Command):
 
         self.bot.users[chat_id].recipient = username
         self.bot.db.save_user(self.bot.users[chat_id])
-        await update.message.reply_text("Success!")
+        await update.message.reply_text(t("success", update, self.bot.users))
 
     def _from_location(self, update: Update) -> Geolocation:
         lat = update.message.location.latitude

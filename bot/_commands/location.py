@@ -28,7 +28,7 @@ class Location(Command):
 
         self.bot.users[chat_id].location = location
         self.bot.db.save_user(self.bot.users[chat_id])
-        await update.message.reply_text("Success!")
+        await update.message.reply_text(t("success", update, self.bot.users))
 
     def _from_location(self, update: Update) -> Geolocation:
         lat = update.message.location.latitude

@@ -20,7 +20,7 @@ class Schedule(Command):
 
         if schedule.find(" ") == -1:
             await update.message.reply_text(
-                t("cron_show_expression").format(
+                t("cron_show_expression", update, self.bot.users).format(
                     user.cron.expression if user.cron is not None else "None"
                 )
             )
@@ -36,7 +36,7 @@ class Schedule(Command):
             await update.message.reply_text(t("need_recipient", update, self.bot.users))
             return
 
-        emess = t("cron_set_schedule")
+        emess = t("cron_set_schedule", update, self.bot.users)
         if user.cron is not None:
             user.cron.stop()
 
@@ -54,7 +54,7 @@ class Schedule(Command):
             user.cron.start()
         except CroniterNotAlphaError | CroniterBadCronError as e:
             self.logger.error(str(e))
-            emess = t("cron_invalid_expression")
+            emess = t("cron_invalid_expression", update, self.bot.users)
         else:
             self.bot.db.save_user(self.bot.users[chat_id])
 
