@@ -1,4 +1,95 @@
-msgid ""
-msgstr ""
+msgid "auth_code_not_sent"
+msgstr "Oops! 😅 The authentication code wasn't sent. Please try again."
+
+msgid "auth_code_sent"
+msgstr "Great! 🎉 The authentication code has been sent. Check your messages."
+
+msgid "connection_error"
+msgstr "Uh-oh! 😓 We're experiencing connection issues. Please try again later."
+
+msgid "cron_disabled"
+msgstr "Cron has been successfully disabled! 🛑"
+
+msgid "cron_enabled"
+msgstr "Cron is now enabled! 🟢 Let's get things rolling!"
+
+msgid "cron_invalid_expression"
+msgstr "Oops! 😅 The provided cron expression is invalid. Please double-check and try again."
+
+msgid "cron_not_initialized"
+msgstr "Cron hasn't been initialized yet! 😮 Please set it up first."
+
+msgid "cron_set_schedule"
+msgstr "Cron schedule has been set! ⏰"
+
+msgid "cron_show_expression"
+msgstr "Here's the current cron expression:"
+
+msgid "database_error"
+msgstr "Yikes! 😬 We encountered a database error. Please try again later."
+
+msgid "db_error"
+msgstr "Oops! 😓 There was a problem with the database. Please try again later."
+
+msgid "enter_auth_code"
+msgstr "Please enter the authentication code you received 📨:"
+
+msgid "enter_phone"
+msgstr "Please enter your phone number 📞:"
+
+msgid "flood_wait_error"
+msgstr "Hold on! ⏱️ We need to wait due to flood restrictions. Please try again later."
+
 msgid "help"
-msgstr "Help!"
+msgstr "Need some help? 🆘 Here are the available commands:"
+
+msgid "language_set"
+msgstr "Language has been successfully set! 🌐"
+
+msgid "language_show"
+msgstr "The current language is:"
+
+msgid "location_show"
+msgstr "Here's your current location 📍:"
+
+msgid "need_location"
+msgstr "Please share your location 🌍:"
+
+msgid "need_recipient"
+msgstr "Please specify a recipient 🎯:"
+
+msgid "reauth_message"
+msgstr "You need to reauthenticate! 🔑 Please log in again."
+
+msgid "recipient_not_change_username"
+msgstr "The recipient cannot change their username at this time. 🚫"
+
+msgid "recipient_not_specified"
+msgstr "No recipient specified! 😕 Please choose one."
+
+msgid "start"
+msgstr "Welcome! 🎉 Let's get started."
+
+msgid "success"
+msgstr "Success! 🥳 Everything went smoothly."
+
+msgid "unknown_command"
+msgstr "Hmm... 🤔 I don't recognize that command. Please try again."
+
+msgid "unknown_error"
+msgstr "Something went wrong! 😓 Please try again later."
+
+msgid "user_already_registered"
+msgstr "You're already registered! ✅ No need to do it again."
+
+msgid "user_deleted"
+msgstr "User has been successfully deleted. 🗑️"
+
+msgid "user_not_change_phone"
+msgstr "The user cannot change their phone number at this time. 🚫"
+
+msgid "user_not_found"
+msgstr "User not found! 😕 Please double-check and try again."
+
+msgid "value_error"
+msgstr "Oops! 😅 There's a value error. Please check your input and try again."
