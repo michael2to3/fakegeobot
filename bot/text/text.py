@@ -10,11 +10,11 @@ class Text:
 
     @staticmethod
     def usertext(text: str, update: Update, users: Dict[int, User]) -> str:
-        localedir = os.path.join(os.path.dirname(__file__), '..', 'locales')
+        localedir = os.path.join(os.path.dirname(__file__), "..", "locales")
         lang = Text._get_lang(update, users)
 
         if lang not in Text._cache:
-            po_filepath = os.path.join(localedir, lang, 'LC_MESSAGES', 'messages.po')
+            po_filepath = os.path.join(localedir, lang, "LC_MESSAGES", "messages.po")
             Text._cache[lang] = polib.pofile(po_filepath)
 
         po = Text._cache[lang]
