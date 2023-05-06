@@ -16,7 +16,9 @@ class Recipient(Command):
 
         if update.message.text.count(" ") < 1:
             await update.message.reply_text(
-                t("show_recipient", update, self.bot.users).format(self.bot.users[chat_id].recipient),
+                t("show_recipient", update, self.bot.users).format(
+                    self.bot.users[chat_id].recipient
+                ),
             )
             return
         username = update.message.text.split(" ")[1]
