@@ -6,7 +6,7 @@ from .._action import Fakelocation
 from .._normalizer import AuthCode
 from telegram import Update
 from telegram.ext import ContextTypes
-from ..text import usertext as t
+from ..text import TextHelper
 
 
 class Code(Command):
@@ -15,18 +15,19 @@ class Code(Command):
         self._config = Config()
 
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
+        text_helper = TextHelper(update, self.bot.users)
         auth_code = update.message.text.split(" ")[1]
         chat_id = update.message.chat_id
 
         if auth_code is None:
             await update.message.reply_text(
-                t("enter_auth_code", update, self.bot.users), parse_mode="Markdown"
+                text_helper.usertext("enter_auth_code"), parse_mode="Markdown"
             )
             return
         if chat_id not in self.bot.users:
             self.logger.warn(f"User not found: {chat_id}")
             await update.message.reply_text(
-                t("user_not_found", update, self.bot.users), parse_mode="Markdown"
+                text_helper.usertext("user_not_found"), parse_mode="Markdown"
             )
             return
 
@@ -38,7 +39,7 @@ class Code(Command):
         self.bot.db.save_user(user)
         self.bot.users[chat_id] = user
         await update.message.reply_text(
-            t("success", update, self.bot.users), parse_mode="Markdown"
+            text_helper.usertext("success"), parse_mode="Markdown"
         )
 
     def _get_cron(self, user: User):

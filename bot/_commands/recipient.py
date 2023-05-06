@@ -3,20 +3,21 @@ from .._config import Config
 from ..model import Geolocation
 from telegram import Update
 from telegram.ext import ContextTypes
-from ..text import usertext as t
+from ..text import TextHelper
 
 
 class Recipient(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
+        text_helper = TextHelper(update, self.bot.users)
         if chat_id not in self.bot.users:
             self.logger.warn(f"User not found: {chat_id}")
-            await update.message.reply_text(t("user_not_found", update, self.bot.users))
+            await update.message.reply_text(text_helper.usertext("user_not_found"))
             return
 
         if update.message.text.count(" ") < 1:
             await update.message.reply_text(
-                t("show_recipient", update, self.bot.users).format(
+                text_helper.usertext("show_recipient").format(
                     self.bot.users[chat_id].recipient
                 ),
             )
@@ -24,13 +25,13 @@ class Recipient(Command):
         username = update.message.text.split(" ")[1]
         if not username:
             await update.message.reply_text(
-                t("recipient_not_change_username", update, self.bot.users)
+                text_helper.usertext("recipient_not_change_username")
             )
             return
 
         self.bot.users[chat_id].recipient = username
         self.bot.db.save_user(self.bot.users[chat_id])
-        await update.message.reply_text(t("success", update, self.bot.users))
+        await update.message.reply_text(text_helper.usertext("success"))
 
     def _from_location(self, update: Update) -> Geolocation:
         lat = update.message.location.latitude

@@ -5,7 +5,7 @@ from .._config import Config
 from croniter.croniter import CroniterBadCronError, CroniterNotAlphaError
 from telegram import Update
 from telegram.ext import ContextTypes
-from ..text import usertext as t
+from ..text import TextHelper
 
 
 class Schedule(Command):
@@ -15,12 +15,13 @@ class Schedule(Command):
 
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
+        text_helper = TextHelper(update, self.bot.users)
         schedule = update.message.text
         user = self.bot.users[chat_id]
 
         if schedule.find(" ") == -1:
             await update.message.reply_text(
-                t("cron_show_expression", update, self.bot.users).format(
+                text_helper.usertext("cron_show_expression").format(
                     user.cron.expression if user.cron is not None else "None"
                 )
             )
@@ -29,14 +30,14 @@ class Schedule(Command):
         schedule = " ".join(schedule.split(" ")[1:])
 
         if user.location is None:
-            await update.message.reply_text(t("need_location", update, self.bot.users))
+            await update.message.reply_text(text_helper.usertext("need_location"))
             return
 
         if user.recipient is None:
-            await update.message.reply_text(t("need_recipient", update, self.bot.users))
+            await update.message.reply_text(text_helper.usertext("need_recipient"))
             return
 
-        emess = t("cron_set_schedule", update, self.bot.users)
+        emess = text_helper.usertext("cron_set_schedule")
         if user.cron is not None:
             user.cron.stop()
 
@@ -54,7 +55,7 @@ class Schedule(Command):
             user.cron.start()
         except CroniterNotAlphaError | CroniterBadCronError as e:
             self.logger.error(str(e))
-            emess = t("cron_invalid_expression", update, self.bot.users)
+            emess = text_helper.usertext("cron_invalid_expression")
         else:
             self.bot.db.save_user(self.bot.users[chat_id])
 

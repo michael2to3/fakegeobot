@@ -2,7 +2,7 @@ import logging
 import traceback
 from sqlite3 import OperationalError
 from typing import Dict
-from .text import usertext as t
+from .text import TextHelper
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
@@ -69,6 +69,7 @@ class Bot(AbstractBot):
         }
 
         handler = handlers.get(command)
+        text_helper = TextHelper(update, self.users)
         if handler:
             try:
                 await handler.handle(update, context)
@@ -76,29 +77,27 @@ class Bot(AbstractBot):
                 self.logger.error(f"ConnectionError: {e}")
 
                 await update.message.reply_text(
-                    t("connection_error", update, self._users)
+                    text_helper.usertext("connection_error")
                 )
             except ValueError as e:
                 self.logger.error(f"ValueError: {e}")
-                await update.message.reply_text(t("value_error", update, self._users))
+                await update.message.reply_text(text_helper.usertext("value_error"))
             except OperationalError as e:
                 error_traceback = traceback.format_exc()
                 self.logger.error(
                     f"Error while handling the command: {command}, {e}\n{error_traceback}"
                 )
-                await update.message.reply_text(
-                    t("database_error", update, self._users)
-                )
+                await update.message.reply_text(text_helper.usertext("database_error"))
             except Exception as e:
                 error_traceback = traceback.format_exc()
                 self.logger.error(
                     f"Error while handling the command: {command}, {e}\n{error_traceback}"
                 )
-                await update.message.reply_text(t("unknown_error", update, self._users))
+                await update.message.reply_text(text_helper.usertext("unknown_error"))
         else:
             self.logger.warn(f"Unknown command: {command}")
             await update.message.reply_text(
-                t("unknown_command", update, self._users).format(command)
+                text_helper.usertext("unknown_command").format(command)
             )
 
     def run(self) -> None:

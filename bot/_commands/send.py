@@ -3,25 +3,22 @@ from .._commands import Command
 from telegram import Update
 from telegram.ext import ContextTypes
 from telethon.errors import AuthKeyUnregisteredError
-from ..text import usertext as t
+from ..text import TextHelper
 
 
 class Send(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
+        text_helper = TextHelper(update, self.bot.users)
         emess = "Well done"
         try:
             user = self.bot.users[chat_id]
 
             if user.location is None:
-                await update.message.reply_text(
-                    t("need_location", update, self.bot.users)
-                )
+                await update.message.reply_text(text_helper.usertext("need_location"))
                 return
             if user.recipient is None:
-                await update.message.reply_text(
-                    t("need_recipient", update, self.bot.users)
-                )
+                await update.message.reply_text(text_helper.usertext("need_recipient"))
                 return
 
             action = Fakelocation(

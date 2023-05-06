@@ -1,4 +1,3 @@
-from .text import Text
+from .texthelper import TextHelper
 
-usertext = Text.usertext
-__all__ = ["Text", "usertext"]
+__all__ = ["TextHelper"]

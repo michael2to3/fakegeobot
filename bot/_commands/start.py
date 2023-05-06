@@ -1,9 +1,10 @@
 from .command import Command
 from telegram import Update
 from telegram.ext import ContextTypes
-from ..text import usertext as t
+from ..text import TextHelper
 
 
 class Start(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
-        await update.message.reply_text(t("start", update, self.bot.users))
+        text_helper = TextHelper(update, self.bot.users)
+        await update.message.reply_text(text_helper.usertext("start"))

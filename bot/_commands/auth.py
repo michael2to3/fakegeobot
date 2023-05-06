@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telethon.errors import FloodWaitError
 from .._config import Config
-from ..text import usertext as t
+from ..text import TextHelper
 
 
 class Auth(Command):
@@ -15,10 +15,11 @@ class Auth(Command):
 
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
+        text_helper = TextHelper(update, self.bot.users)
 
         if chat_id in self.bot.users:
             await update.message.reply_text(
-                t("user_already_registered", update, self.bot.users),
+                text_helper.usertext("user_already_registered"),
                 parse_mode="Markdown",
             )
             return
@@ -29,17 +30,17 @@ class Auth(Command):
 
         if update.message.text.count(" ") < 1:
             await update.message.reply_text(
-                t("enter_auth_code", update, self.bot.users), parse_mode="Markdown"
+                text_helper.usertext("enter_auth_code"), parse_mode="Markdown"
             )
             return
         phone = update.message.text.split(" ")[1]
         if phone is None:
             await update.message.reply_text(
-                t("enter_phone", update, self.bot.users), parse_mode="Markdown"
+                text_helper.usertext("enter_phone"), parse_mode="Markdown"
             )
             return
 
-        emess = t("auth_code_sent", update, self.bot.users)
+        emess = text_helper.usertext("auth_code_sent")
 
         info = Session(
             session_name=str(chat_id),
@@ -65,10 +66,10 @@ class Auth(Command):
             user.session.phone_code_hash = await RequestCode.get(user, self.bot.api)
         except RuntimeError as e:
             self.logger.error(e)
-            emess = t("auth_code_not_sent", update, self.bot.users)
+            emess = text_helper.usertext("auth_code_not_sent")
         except FloodWaitError as e:
             self.logger.error(e)
-            emess = t("flood_wait_error", update, self.bot.users)
+            emess = text_helper.usertext("flood_wait_error")
         else:
             self.bot.users[chat_id] = user
             self.bot.db.save_user(user)
