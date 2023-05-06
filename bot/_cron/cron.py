@@ -3,6 +3,7 @@ import logging
 import time
 from typing import Any, Callable, Coroutine
 from croniter import croniter
+from .._config import Config
 
 
 class Cron:
@@ -85,3 +86,15 @@ class Cron:
     @property
     def timeout(self) -> int:
         return self._callback_timeout
+
+    @staticmethod
+    def create_cron(
+        config: Config,
+        callback: Callable[[], Coroutine[Any, Any, None]],
+        cron_expression: str | None = None,
+        callback_timeout: int | None = None,
+    ):
+        cron_expression = cron_expression or config.cron_expression
+        callback_timeout = callback_timeout or config.cron_timeout
+
+        return Cron(callback, cron_expression, callback_timeout)

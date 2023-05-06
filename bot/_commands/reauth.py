@@ -1,5 +1,3 @@
-from sqlite3 import OperationalError
-
 from .command import Command
 from .._user import RequestCode
 from telegram import Update
@@ -11,7 +9,7 @@ class Reauth(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
 
-        if chat_id not in self.bot.users:
+        if chat_id not in self._context.users:
             self.logger.warn(f"User not found: {chat_id}")
             await update.message.reply_text(self.text_helper.usertext("user_not_found"))
             return
@@ -23,7 +21,7 @@ class Reauth(Command):
 
         emess = self.text_helper.usertext("auth_code_sent")
 
-        user = self.bot.users[chat_id]
+        user = self._context.users[chat_id]
         if not user.session.phone:
             await update.message.reply_text(
                 self.text_helper.usertext("user_not_change_phone")
@@ -31,13 +29,15 @@ class Reauth(Command):
             self.logger.warn(f"User doesn't have a phone number: {chat_id}")
             return
         try:
-            user.session.phone_code_hash = await RequestCode.get(user, self.bot.api)
+            user.session.phone_code_hash = await RequestCode.get(
+                user, self._context.api
+            )
         except RuntimeError:
             emess = self.text_helper.usertext("auth_code_not_sent")
         except FloodWaitError as e:
             emess = self.text_helper.usertext("flood_wait_error").format(str(e.seconds))
         else:
-            self.bot.users[chat_id] = user
-            self.bot.db.save_user(user)
+            self._context.users[chat_id] = user
+            self._context.db.save_user(user)
         finally:
             await update.message.reply_text(emess, parse_mode="Markdown")

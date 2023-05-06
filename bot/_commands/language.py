@@ -7,12 +7,12 @@ class Language(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
 
-        if chat_id not in self.bot.users:
+        if chat_id not in self._context.users:
             self.logger.warn(f"User not found: {chat_id}")
             await update.message.reply_text(self.text_helper.usertext("user_not_found"))
             return
 
-        user = self.bot.users[chat_id]
+        user = self._context.users[chat_id]
         avaliable_languages = [
             "en",
             "ru",
@@ -36,6 +36,6 @@ class Language(Command):
             )
             return
 
-        self.bot.users[chat_id].language = lang
-        self.bot.db.save_user(user)
+        self._context.users[chat_id].language = lang
+        self._context.db.save_user(user)
         await update.message.reply_text(self.text_helper.usertext("language_set"))

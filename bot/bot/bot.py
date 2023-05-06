@@ -2,11 +2,13 @@ import logging
 import traceback
 from sqlite3 import OperationalError
 from typing import Dict
-from .text import TextHelper
+from ..text import TextHelper
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
+from .botcontext import BotContext
+from .._config import Config
 
-from ._commands import (
+from .._commands import (
     Auth,
     Code,
     Delete,
@@ -22,9 +24,9 @@ from ._commands import (
     Start,
     Language,
 )
-from ._db import DatabaseHandler
+from .._db import DatabaseHandler
 from .abstract_bot import AbstractBot
-from .model import ApiApp, User
+from ..model import ApiApp, User
 
 
 class Bot(AbstractBot):
@@ -34,13 +36,14 @@ class Bot(AbstractBot):
     _users: Dict[int, User]
     _db: DatabaseHandler
 
-    def __init__(self, api: ApiApp, token: str, db: DatabaseHandler):
+    def __init__(self, api: ApiApp, token: str, db: DatabaseHandler, config: Config):
         self.logger = logging.getLogger(__name__)
         self._app = Application.builder().token(token).build()
         self._api = api
         self._db = db
         users = list(db.load_all_users())
         self._users = {user.session.chat_id: user for user in users}
+        self._context = BotContext(api, self._users, self._db, config)
 
     async def _handle_command(
         self, command: str, update: Update, context: ContextTypes.DEFAULT_TYPE
@@ -53,20 +56,20 @@ class Bot(AbstractBot):
 
         text_helper = TextHelper(update, self.users)
         handlers = {
-            "start": Start(self, text_helper),
-            "help": Help(self, text_helper),
-            "auth": Auth(self, text_helper),
-            "code": Code(self, text_helper),
-            "schedule": Schedule(self, text_helper),
-            "send": Send(self, text_helper),
-            "disable": Disable(self, text_helper),
-            "enable": Enable(self, text_helper),
-            "delete": Delete(self, text_helper),
-            "location": Location(self, text_helper),
-            "recipient": Recipient(self, text_helper),
-            "reauth": Reauth(self, text_helper),
-            "info": Info(self, text_helper),
-            "language": Language(self, text_helper),
+            "start": Start(self._context, text_helper),
+            "help": Help(self._context, text_helper),
+            "auth": Auth(self._context, text_helper),
+            "code": Code(self._context, text_helper),
+            "schedule": Schedule(self._context, text_helper),
+            "send": Send(self._context, text_helper),
+            "disable": Disable(self._context, text_helper),
+            "enable": Enable(self._context, text_helper),
+            "delete": Delete(self._context, text_helper),
+            "location": Location(self._context, text_helper),
+            "recipient": Recipient(self._context, text_helper),
+            "reauth": Reauth(self._context, text_helper),
+            "info": Info(self._context, text_helper),
+            "language": Language(self._context, text_helper),
         }
 
         handler = handlers.get(command)

@@ -1,6 +1,9 @@
 from .._cron import Cron
 from .geolocation import Geolocation
 from .session import Session
+from .session import Session
+from .._cron import Cron
+from .._config import Config
 
 
 class User:
@@ -62,3 +65,16 @@ class User:
 
     def __str__(self):
         return f"User(cron={self.cron}, location={self.location}, session={self.session}, recipient={self.recipient}), language={self.language}"
+
+    @staticmethod
+    def create_user(
+        config: Config,
+        cron: Cron | None,
+        location: Geolocation | None,
+        session: Session,
+        recipient: str | None,
+        language: str,
+    ):
+        location = location or config.location
+        recipient = recipient or config.recipient
+        return User(cron, location, session, recipient, language)

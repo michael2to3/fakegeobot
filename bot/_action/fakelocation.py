@@ -4,6 +4,7 @@ from .action import Action
 from ..model import ApiApp, Geolocation, Session
 from telethon import TelegramClient
 from telethon.types import InputMediaGeoLive
+from .._config import Config
 
 
 class Fakelocation(Action):
@@ -47,3 +48,15 @@ class Fakelocation(Action):
         # Still send InputMediaGeoLive
         stream: InputMediaGeoLive = geo.get_input_media_geo_live()
         await client.send_message(self._recipient, file=stream)
+
+    @staticmethod
+    def create_fakelocation(
+        config: Config,
+        api: ApiApp,
+        session: Session,
+        location: Geolocation | None,
+        recipient: str | None,
+    ):
+        location = location or config.location
+        recipient = recipient or config.recipient
+        return Fakelocation(api, session, location, recipient)

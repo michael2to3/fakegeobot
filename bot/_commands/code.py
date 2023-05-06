@@ -1,6 +1,5 @@
 from .command import Command
 from ..model import User
-from .._config import Config
 from .._cron import Cron
 from .._action import Fakelocation
 from .._normalizer import AuthCode
@@ -18,62 +17,33 @@ class Code(Command):
                 self.text_helper.usertext("enter_auth_code"), parse_mode="Markdown"
             )
             return
-        if chat_id not in self.bot.users:
+        if chat_id not in self._context.users:
             self.logger.warn(f"User not found: {chat_id}")
             await update.message.reply_text(
                 self.text_helper.usertext("user_not_found"), parse_mode="Markdown"
             )
             return
 
-        user = self.bot.users[chat_id]
+        user = self._context.users[chat_id]
         code = AuthCode.normalize(auth_code)
         user.session.auth_code = int(code)
         user.cron = self._get_cron(user)
         user.cron.start()
-        self.bot.db.save_user(user)
-        self.bot.users[chat_id] = user
+        self._context.db.save_user(user)
+        self._context.users[chat_id] = user
         await update.message.reply_text(
             self.text_helper.usertext("success"), parse_mode="Markdown"
         )
 
     def _get_cron(self, user: User):
-        location = self._config.location
-        recipient = self._config.recipient
-        expression = self._config.cron_expression
-        timeout = self._config.cron_timeout
-        if user.cron is None:
-            return self._default_cron(user)
-        else:
-            user.cron.stop()
-
-        if user.location is not None:
-            location = user.location
-
-        if user.recipient is not None:
-            recipient = user.recipient
-
-        if user.cron.expression is not None:
-            expression = user.cron.expression
-
-        if user.cron.timeout is not None:
-            timeout = user.cron.timeout
-
-        return Cron(
-            callback=Fakelocation(
-                self.bot.api, user.session, location, recipient
+        config = self._context.config
+        return Cron.create_cron(
+            config,
+            callback=Fakelocation.create_fakelocation(
+                config, self._context.api, user.session, user.location, user.recipient
             ).execute,
-            cron_expression=expression,
-            callback_timeout=timeout,
-        )
-
-    def _default_cron(self, user: User):
-        return Cron(
-            callback=Fakelocation(
-                self.bot.api,
-                user.session,
-                self._config.location,
-                self._config.recipient,
-            ).execute,
-            cron_expression=self._config.cron_expression,
-            callback_timeout=self._config.cron_timeout,
+            cron_expression=user.cron.expression if user.cron is not None else None,
+            callback_timeout=user.cron.timeout
+            if user.cron is not None
+            else config.cron_timeout,
         )

@@ -4,14 +4,13 @@ from ..model import Session, User
 from telegram import Update
 from telegram.ext import ContextTypes
 from telethon.errors import FloodWaitError
-from .._config import Config
 
 
 class Auth(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
 
-        if chat_id in self.bot.users:
+        if chat_id in self._context.users:
             await update.message.reply_text(
                 self.text_helper.usertext("user_already_registered"),
                 parse_mode="Markdown",
@@ -44,20 +43,21 @@ class Auth(Command):
             auth_code=None,
             phone_code_hash=None,
         )
-        location = None if self._config.location is None else self._config.location
-        recipient = None if self._config.recipient is None else self._config.recipient
         language_code = update.message.from_user.language_code
         language = language_code.split("_")[0]
-        user = User(
+        user = User.create_user(
+            self._context.config,
             cron=None,
-            location=location,
+            location=None,
             session=info,
-            recipient=recipient,
+            recipient=None,
             language=language,
         )
 
         try:
-            user.session.phone_code_hash = await RequestCode.get(user, self.bot.api)
+            user.session.phone_code_hash = await RequestCode.get(
+                user, self._context.api
+            )
         except RuntimeError as e:
             self.logger.error(e)
             emess = self.text_helper.usertext("auth_code_not_sent")
@@ -65,7 +65,7 @@ class Auth(Command):
             self.logger.error(e)
             emess = self.text_helper.usertext("flood_wait_error")
         else:
-            self.bot.users[chat_id] = user
-            self.bot.db.save_user(user)
+            self._context.users[chat_id] = user
+            self._context.db.save_user(user)
         finally:
             await update.message.reply_text(emess, parse_mode="Markdown")

@@ -7,7 +7,7 @@ from telegram.ext import ContextTypes
 class Location(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
-        if chat_id not in self.bot.users:
+        if chat_id not in self._context.users:
             self.logger.warn(f"User not found: {chat_id}")
             await update.message.reply_text(self.text_helper.usertext("user_not_found"))
             return
@@ -19,14 +19,14 @@ class Location(Command):
             if update.message.text.count(" ") <= 1:
                 await update.message.reply_text(
                     self.text_helper.usertext("location_show").format(
-                        self.bot.users[chat_id].location
+                        self._context.users[chat_id].location
                     )
                 )
                 return
             location = self._from_text(update)
 
-        self.bot.users[chat_id].location = location
-        self.bot.db.save_user(self.bot.users[chat_id])
+        self._context.users[chat_id].location = location
+        self._context.db.save_user(self._context.users[chat_id])
         await update.message.reply_text(self.text_helper.usertext("success"))
 
     def _from_location(self, update: Update) -> Geolocation:
