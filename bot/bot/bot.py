@@ -98,7 +98,7 @@ class Bot(AbstractBot):
                 )
                 await update.message.reply_text(text_helper.usertext("unknown_error"))
         else:
-            self.logger.warn(f"Unknown command: {command}")
+            self.logger.warning(f"Unknown command: {command}")
             await update.message.reply_text(
                 text_helper.usertext("unknown_command").format(command)
             )
