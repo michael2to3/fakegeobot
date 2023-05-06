@@ -10,7 +10,7 @@ class Send(Command):
         chat_id = update.message.chat_id
         emess = "Well done"
         try:
-            user = self._context.users[chat_id]
+            user = self.context.users[chat_id]
 
             if user.location is None:
                 await update.message.reply_text(
@@ -24,7 +24,7 @@ class Send(Command):
                 return
 
             action = Fakelocation(
-                self._context.api, user.session, user.location, user.recipient
+                self.context.api, user.session, user.location, user.recipient
             )
             await action.execute()
         except AuthKeyUnregisteredError as e:

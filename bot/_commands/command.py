@@ -10,7 +10,7 @@ from telegram.ext import ContextTypes
 class Command(ABC):
     def __init__(self, context: BotContext, text_helper: TextHelper):
         self.logger = logging.getLogger(__name__)
-        self._context = context
+        self.context = context
         self.text_helper = text_helper
 
     @abstractmethod

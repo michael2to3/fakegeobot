@@ -10,7 +10,7 @@ class Schedule(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
         schedule = update.message.text
-        user = self._context.users[chat_id]
+        user = self.context.users[chat_id]
 
         if schedule.find(" ") == -1:
             await update.message.reply_text(
@@ -37,12 +37,12 @@ class Schedule(Command):
         try:
             user.cron = Cron(
                 callback=Fakelocation(
-                    self._context.api, user.session, user.location, user.recipient
+                    self.context.api, user.session, user.location, user.recipient
                 ).execute,
                 cron_expression=schedule,
                 callback_timeout=user.cron.timeout
                 if user.cron is not None
-                else self._context.config.cron_timeout,
+                else self.context.config.cron_timeout,
             )
 
             user.cron.start()
@@ -50,6 +50,6 @@ class Schedule(Command):
             self.logger.error(str(e))
             emess = self.text_helper.usertext("cron_invalid_expression")
         else:
-            self._context.db.save_user(self._context.users[chat_id])
+            self.context.db.save_user(self.context.users[chat_id])
 
         await update.message.reply_text(emess)

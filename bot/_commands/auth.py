@@ -10,7 +10,7 @@ class Auth(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
 
-        if chat_id in self._context.users:
+        if chat_id in self.context.users:
             await update.message.reply_text(
                 self.text_helper.usertext("user_already_registered"),
                 parse_mode="Markdown",
@@ -46,7 +46,7 @@ class Auth(Command):
         language_code = update.message.from_user.language_code
         language = language_code.split("_")[0]
         user = User.create_user(
-            self._context.config,
+            self.context.config,
             cron=None,
             location=None,
             session=info,
@@ -55,9 +55,7 @@ class Auth(Command):
         )
 
         try:
-            user.session.phone_code_hash = await RequestCode.get(
-                user, self._context.api
-            )
+            user.session.phone_code_hash = await RequestCode.get(user, self.context.api)
         except RuntimeError as e:
             self.logger.error(e)
             emess = self.text_helper.usertext("auth_code_not_sent")
@@ -65,7 +63,7 @@ class Auth(Command):
             self.logger.error(e)
             emess = self.text_helper.usertext("flood_wait_error")
         else:
-            self._context.users[chat_id] = user
-            self._context.db.save_user(user)
+            self.context.users[chat_id] = user
+            self.context.db.save_user(user)
         finally:
             await update.message.reply_text(emess, parse_mode="Markdown")

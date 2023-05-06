@@ -17,30 +17,30 @@ class Code(Command):
                 self.text_helper.usertext("enter_auth_code"), parse_mode="Markdown"
             )
             return
-        if chat_id not in self._context.users:
-            self.logger.warn(f"User not found: {chat_id}")
+        if chat_id not in self.context.users:
+            self.logger.warning(f"User not found: {chat_id}")
             await update.message.reply_text(
                 self.text_helper.usertext("user_not_found"), parse_mode="Markdown"
             )
             return
 
-        user = self._context.users[chat_id]
+        user = self.context.users[chat_id]
         code = AuthCode.normalize(auth_code)
         user.session.auth_code = int(code)
         user.cron = self._get_cron(user)
         user.cron.start()
-        self._context.db.save_user(user)
-        self._context.users[chat_id] = user
+        self.context.db.save_user(user)
+        self.context.users[chat_id] = user
         await update.message.reply_text(
             self.text_helper.usertext("success"), parse_mode="Markdown"
         )
 
     def _get_cron(self, user: User):
-        config = self._context.config
+        config = self.context.config
         return Cron.create_cron(
             config,
             callback=Fakelocation.create_fakelocation(
-                config, self._context.api, user.session, user.location, user.recipient
+                config, self.context.api, user.session, user.location, user.recipient
             ).execute,
             cron_expression=user.cron.expression if user.cron is not None else None,
             callback_timeout=user.cron.timeout

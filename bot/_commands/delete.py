@@ -7,8 +7,8 @@ class Delete(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
         try:
-            self._context.db.delete_user(chat_id)
-            del self._context.users[chat_id]
+            self.context.db.delete_user(chat_id)
+            del self.context.users[chat_id]
         except KeyError as e:
             self.logger.error(str(e))
             await update.message.reply_text(self.text_helper.usertext("user_not_found"))

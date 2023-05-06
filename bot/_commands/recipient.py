@@ -8,15 +8,15 @@ from telegram.ext import ContextTypes
 class Recipient(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
-        if chat_id not in self._context.users:
-            self.logger.warn(f"User not found: {chat_id}")
+        if chat_id not in self.context.users:
+            self.logger.warning(f"User not found: {chat_id}")
             await update.message.reply_text(self.text_helper.usertext("user_not_found"))
             return
 
         if update.message.text.count(" ") < 1:
             await update.message.reply_text(
                 self.text_helper.usertext("show_recipient").format(
-                    self._context.users[chat_id].recipient
+                    self.context.users[chat_id].recipient
                 ),
             )
             return
@@ -27,8 +27,8 @@ class Recipient(Command):
             )
             return
 
-        self._context.users[chat_id].recipient = username
-        self._context.db.save_user(self._context.users[chat_id])
+        self.context.users[chat_id].recipient = username
+        self.context.db.save_user(self.context.users[chat_id])
         await update.message.reply_text(self.text_helper.usertext("success"))
 
     def _from_location(self, update: Update) -> Geolocation:
