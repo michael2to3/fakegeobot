@@ -1,8 +1,6 @@
 from .._cron import Cron
 from .geolocation import Geolocation
 from .session import Session
-from .session import Session
-from .._cron import Cron
 from .._config import Config
 
 
