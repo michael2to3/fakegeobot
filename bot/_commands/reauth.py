@@ -37,9 +37,6 @@ class Reauth(Command):
             emess = t("auth_code_not_sent", update, self.bot.users)
         except FloodWaitError as e:
             emess = t("flood_wait_error", update, self.bot.users).format(str(e.seconds))
-        except OperationalError as e:
-            self.logger.error(str(e))
-            emess = t("db_error", update, self.bot.users)
         else:
             self.bot.users[chat_id] = user
             self.bot.db.save_user(user)
