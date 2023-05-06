@@ -62,7 +62,9 @@ class TestSend(asynctest.TestCase):
             self.bot.db.save_user = MagicMock()
 
             # Mock Fakelocation
-            with asynctest.patch.object(Fakelocation, "execute", new_callable=AsyncMock) as mock_fakelocation:
+            with asynctest.patch.object(
+                Fakelocation, "execute", new_callable=AsyncMock
+            ) as mock_fakelocation:
                 await send_command.handle(update, context)
 
             update.message.reply_text.assert_called()

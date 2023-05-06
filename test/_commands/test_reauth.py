@@ -61,7 +61,9 @@ class TestReauth(asynctest.TestCase):
 
             self.bot.db.save_user = MagicMock()
 
-            with asynctest.patch.object(RequestCode, "get", new_callable=AsyncMock) as mock_request_code:
+            with asynctest.patch.object(
+                RequestCode, "get", new_callable=AsyncMock
+            ) as mock_request_code:
                 mock_request_code.return_value = "123456"
                 await code_command.handle(update, context)
 

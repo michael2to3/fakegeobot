@@ -61,7 +61,9 @@ class TestSchedule(asynctest.TestCase):
 
             await code_command.handle(update, context)
             update.message.reply_text.assert_called()
-            self.assertEqual(self.bot.context.users[1].cron._cron_expression, "*/5 */5 */5 */5 */5")
+            self.assertEqual(
+                self.bot.context.users[1].cron._cron_expression, "*/5 */5 */5 */5 */5"
+            )
 
             update.message.reply_text.reset_mock()
             self.bot.context.users[1].cron.stop()
