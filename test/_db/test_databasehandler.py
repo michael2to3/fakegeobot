@@ -1,8 +1,7 @@
 import os
 import unittest
-import time
 from bot.model import ApiApp, Geolocation, User, Session
-from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy import create_engine
 from bot._db.databasehandler import DatabaseHandler, Base
 
 
@@ -34,6 +33,7 @@ class TestDatabaseHandler(unittest.TestCase):
                 "test_session", "test_user", 123, "+1234567890", 1111, "abcd1234"
             ),
             recipient="test_recipient",
+            language="en",
         )
 
     def tearDown(self):

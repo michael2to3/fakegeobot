@@ -1,5 +1,5 @@
 import asynctest
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import MagicMock, AsyncMock
 
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -8,18 +8,28 @@ from bot._commands import Code
 from bot._cron import Cron
 from bot.model import ApiApp, User, Geolocation
 from bot._db import DatabaseHandler
-from bot.bot import Bot
+from bot.bot import Bot, BotContext
 from croniter import CroniterBadCronError
 from bot._config import Config
+from bot.text import TextHelper
 
 
 class TestCode(asynctest.TestCase):
     def setUp(self):
-        self.api = MagicMock(spec=ApiApp)
+        self.api = ApiApp(api_id=1, api_hash="1")
         self.token = "fake_token"
         self.db = MagicMock(spec=DatabaseHandler)
         self.bot = MagicMock(spec=Bot)
+        config = MagicMock(spec=Config)
+        config.location = Geolocation(100, 100, 100)
+        config.recipient = "fake_recipient"
+        config.cron_expression = "*/5 * * * *"
+        config.cron_timeout = 300
+        self.bot.context = BotContext(self.api, {}, self.db, config)
+        self.update = MagicMock(spec=Update)
+        self.text_helper = MagicMock(spec=TextHelper)
         self.bot.users = self.create_mock_users()
+        self.bot.context.users = self.bot.users
 
     def create_mock_users(self):
         users = {}
@@ -37,15 +47,7 @@ class TestCode(asynctest.TestCase):
             update = MagicMock(spec=Update)
             context = MagicMock(spec=ContextTypes.DEFAULT_TYPE)
 
-            with patch("bot._commands.code.Config") as MockConfig:
-                config = MagicMock(spec=Config)
-                config.location = Geolocation(100, 100, 100)
-                config.recipient = "fake_recipient"
-                config.cron_expression = "*/5 * * * *"
-                config.cron_timeout = 300
-                MockConfig.return_value = config
-                MockConfig.return_value.api = self.api
-                code_command = Code(self.bot)
+            code_command = Code(self.bot.context, self.text_helper)
 
             update.message.chat_id = 1
             update.message.text = "/code 1.2.3.4.5"
@@ -54,12 +56,9 @@ class TestCode(asynctest.TestCase):
             self.bot.db.save_user = MagicMock()
 
             await code_command.handle(update, context)
-
-            code_command._get_cron(self.bot.users[1]).stop()
             update.message.reply_text.assert_called()
+
+            update.message.reply_text.reset_mock()
+            self.bot.context.users[1].cron.stop()
         except CroniterBadCronError as e:
             self.fail(f"CroniterBadCronError raised: {e}")
-
-
-if __name__ == "__main__":
-    asynctest.main()

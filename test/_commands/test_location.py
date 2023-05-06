@@ -1,19 +1,72 @@
 import asynctest
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import MagicMock, AsyncMock
+
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot._commands import Schedule, Info, Location, Reauth, Recipient, Send, Start
+
+from bot._commands import Location
+from bot._cron import Cron
+from bot.model import ApiApp, User, Geolocation
+from bot._db import DatabaseHandler
+from bot.bot import Bot, BotContext
+from croniter import CroniterBadCronError
+from bot._config import Config
+from bot.text import TextHelper
 
 
 class TestLocation(asynctest.TestCase):
-    async def test_handle(self):
-        bot = MagicMock()
-        message_mock = MagicMock(chat_id=1, text="/location 10.0 20.0")
-        message_mock.reply_text = AsyncMock()
-        update = Update(update_id=1, message=message_mock)
-        handler = Location(bot)
-        context = MagicMock(spec=ContextTypes.DEFAULT_TYPE)
+    def setUp(self):
+        self.api = ApiApp(api_id=1, api_hash="1")
+        self.token = "fake_token"
+        self.db = MagicMock(spec=DatabaseHandler)
+        self.bot = MagicMock(spec=Bot)
+        config = MagicMock(spec=Config)
+        config.location = Geolocation(100, 100, 100)
+        config.recipient = "fake_recipient"
+        config.cron_expression = "*/5 * * * *"
+        config.cron_timeout = 300
+        self.bot.context = BotContext(self.api, {}, self.db, config)
+        self.update = MagicMock(spec=Update)
+        self.text_helper = MagicMock(spec=TextHelper)
+        self.bot.users = self.create_mock_users()
+        self.bot.context.users = self.bot.users
 
-        with patch("bot._commands.Location.handle") as mock_handle:
-            await handler.handle(update, context)
-            mock_handle.assert_called()
+    def create_mock_users(self):
+        users = {}
+        for i in range(1, 6):
+            user = MagicMock(spec=User)
+            user.session.chat_id = i
+            user.cron = MagicMock(spec=Cron)
+            user.cron.stop = MagicMock()
+            user.cron.start = MagicMock()
+            user.cron.expression = "*/5 * * * *"
+            user.cron.timeout = 300
+            user.location = Geolocation(0, 0, 0)
+            users[i] = user
+        return users
+
+    async def test_handle(self):
+        try:
+            update = MagicMock(spec=Update)
+            context = MagicMock(spec=ContextTypes.DEFAULT_TYPE)
+
+            code_command = Location(self.bot.context, self.text_helper)
+
+            update.message.location = None
+            update.message.chat_id = 1
+            update.message.text = "/location 300 300 300"
+            update.message.reply_text = AsyncMock()
+
+            self.bot.db.save_user = MagicMock()
+
+            await code_command.handle(update, context)
+            update.message.reply_text.assert_called()
+            location = self.bot.context.users[1].location
+            self.assertEqual(location.lat, 300)
+            self.assertEqual(location.long, 300)
+            self.assertEqual(location.interval, 300)
+
+            update.message.reply_text.reset_mock()
+            self.bot.context.users[1].cron.stop()
+        except CroniterBadCronError as e:
+            self.fail(f"CroniterBadCronError raised: {e}")
