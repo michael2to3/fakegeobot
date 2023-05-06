@@ -2,16 +2,14 @@ from .command import Command
 from ..model import Geolocation
 from telegram import Update
 from telegram.ext import ContextTypes
-from ..text import TextHelper
 
 
 class Location(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
-        text_helper = TextHelper(update, self.bot.users)
         if chat_id not in self.bot.users:
             self.logger.warn(f"User not found: {chat_id}")
-            await update.message.reply_text(text_helper.usertext("user_not_found"))
+            await update.message.reply_text(self.text_helper.usertext("user_not_found"))
             return
 
         location = None
@@ -20,7 +18,7 @@ class Location(Command):
         else:
             if update.message.text.count(" ") <= 1:
                 await update.message.reply_text(
-                    text_helper.usertext("location_show").format(
+                    self.text_helper.usertext("location_show").format(
                         self.bot.users[chat_id].location
                     )
                 )
@@ -29,7 +27,7 @@ class Location(Command):
 
         self.bot.users[chat_id].location = location
         self.bot.db.save_user(self.bot.users[chat_id])
-        await update.message.reply_text(text_helper.usertext("success"))
+        await update.message.reply_text(self.text_helper.usertext("success"))
 
     def _from_location(self, update: Update) -> Geolocation:
         lat = update.message.location.latitude

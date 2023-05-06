@@ -51,25 +51,25 @@ class Bot(AbstractBot):
 
         command = update.message.text.split(" ")[0].lstrip("/")
 
+        text_helper = TextHelper(update, self.users)
         handlers = {
-            "start": Start(self),
-            "help": Help(self),
-            "auth": Auth(self),
-            "code": Code(self),
-            "schedule": Schedule(self),
-            "send": Send(self),
-            "disable": Disable(self),
-            "enable": Enable(self),
-            "delete": Delete(self),
-            "location": Location(self),
-            "recipient": Recipient(self),
-            "reauth": Reauth(self),
-            "info": Info(self),
-            "language": Language(self),
+            "start": Start(self, text_helper),
+            "help": Help(self, text_helper),
+            "auth": Auth(self, text_helper),
+            "code": Code(self, text_helper),
+            "schedule": Schedule(self, text_helper),
+            "send": Send(self, text_helper),
+            "disable": Disable(self, text_helper),
+            "enable": Enable(self, text_helper),
+            "delete": Delete(self, text_helper),
+            "location": Location(self, text_helper),
+            "recipient": Recipient(self, text_helper),
+            "reauth": Reauth(self, text_helper),
+            "info": Info(self, text_helper),
+            "language": Language(self, text_helper),
         }
 
         handler = handlers.get(command)
-        text_helper = TextHelper(update, self.users)
         if handler:
             try:
                 await handler.handle(update, context)
