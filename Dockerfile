@@ -1,7 +1,7 @@
-FROM python:3.9
+FROM python:3.11
 ENV TZ="Europe/Moscow"
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY ./fakegeo_polychessbot /app
+COPY ./ /app
 WORKDIR /app
-ENTRYPOINT ["python", "main.py"]
+ENTRYPOINT ["python", "."]
