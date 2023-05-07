@@ -17,6 +17,7 @@ jobs:
 
     - name: Grant write permissions to test directory
       run: |
+        mkdir db
         chmod -R +w ./db
 
     - name: Install dependencies
