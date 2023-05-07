@@ -61,7 +61,7 @@ class TestRecipient(asynctest.TestCase):
 
             await code_command.handle(update, context)
             update.message.reply_text.assert_called()
-            self.assertEquals(self.bot.context.users[1].recipient, "@me")
+            self.assertEqual(self.bot.context.users[1].recipient, "@me")
 
             update.message.reply_text.reset_mock()
             self.bot.context.users[1].cron.stop()
