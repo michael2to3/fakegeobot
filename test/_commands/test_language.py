@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, AsyncMock
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from bot._commands import Start
+from bot._commands import Language
 from bot._cron import Cron
 from bot.model import ApiApp, User, Geolocation
 from bot._db import DatabaseHandler
@@ -14,7 +14,7 @@ from bot._config import Config
 from bot.text import TextHelper
 
 
-class TestStart(asynctest.TestCase):
+class TestLanguage(asynctest.TestCase):
     def setUp(self):
         self.api = ApiApp(api_id=1, api_hash="1")
         self.token = "fake_token"
@@ -50,17 +50,18 @@ class TestStart(asynctest.TestCase):
             update = MagicMock(spec=Update)
             context = MagicMock(spec=ContextTypes.DEFAULT_TYPE)
 
-            code_command = Start(self.bot.context, self.text_helper)
+            code_command = Language(self.bot.context, self.text_helper)
 
             update.message.location = None
             update.message.chat_id = 1
-            update.message.text = "/start"
+            update.message.text = "/language ru"
             update.message.reply_text = AsyncMock()
 
             self.bot.db.save_user = MagicMock()
 
             await code_command.handle(update, context)
             update.message.reply_text.assert_called()
+            self.assertEqual(self.bot.context.users[1].language, "ru")
 
             update.message.reply_text.reset_mock()
             self.bot.context.users[1].cron.stop()

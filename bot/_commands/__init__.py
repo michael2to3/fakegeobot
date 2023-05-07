@@ -12,6 +12,7 @@ from .recipient import Recipient
 from .schedule import Schedule
 from .send import Send
 from .start import Start
+from .language import Language
 
 __all__ = [
     "Command",
@@ -28,4 +29,5 @@ __all__ = [
     "Recipient",
     "Reauth",
     "Info",
+    "Language",
 ]

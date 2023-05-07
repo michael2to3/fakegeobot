@@ -1,5 +1,3 @@
-from sqlite3 import OperationalError
-
 from .command import Command
 from .._user import RequestCode
 from telegram import Update
@@ -11,43 +9,33 @@ class Reauth(Command):
     async def handle(self, update: Update, _: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
 
-        if chat_id not in self.bot.users:
-            self.logger.warn(f"User not found: {chat_id}")
-            await update.message.reply_text("User not found")
+        if chat_id not in self.context.users:
+            self.logger.warning(f"User not found: {chat_id}")
+            await update.message.reply_text(self.text_helper.usertext("user_not_found"))
             return
 
         await update.message.reply_text(
-            "You already auth, your session will be *overwritten*\nUsing this command very often yuo can get *banned* by telegram",
+            self.text_helper.usertext("reauth_message"),
             parse_mode="Markdown",
         )
 
-        emess = """
-Send me auth code each char separated by a dot
-For example: Login code: 61516
-You put: /code 6.1.5.1.6
-It's need to bypass protect telegram
+        emess = self.text_helper.usertext("auth_code_sent")
 
-*⚠️ Warning*: By creating an authentication session, you are granting this bot *full access* to your Telegram account. This includes the ability to read your messages, send messages on your behalf, and manage your account. Please ensure you trust the bot and its developers before proceeding. If you have any concerns, please review the bot's source code or contact the developers directly.
-"""
-
-        user = self.bot.users[chat_id]
+        user = self.context.users[chat_id]
         if not user.session.phone:
             await update.message.reply_text(
-                "Hmm, you don't have a phone number yet\nTry /delete your self and /auth again"
+                self.text_helper.usertext("user_not_change_phone")
             )
-            self.logger.warn(f"User doesn't have a phone number: {chat_id}")
+            self.logger.warning(f"User doesn't have a phone number: {chat_id}")
             return
         try:
-            user.session.phone_code_hash = await RequestCode.get(user, self.bot.api)
+            user.session.phone_code_hash = await RequestCode.get(user, self.context.api)
         except RuntimeError:
-            emess = "Oops bad try access your account"
+            emess = self.text_helper.usertext("auth_code_not_sent")
         except FloodWaitError as e:
-            emess = f"Oops flood exception! Wait: {e.seconds} seconds"
-        except OperationalError as e:
-            self.logger.error(str(e))
-            emess = "Oops database is fire!"
+            emess = self.text_helper.usertext("flood_wait_error").format(str(e.seconds))
         else:
-            self.bot.users[chat_id] = user
-            self.bot.db.save_user(user)
+            self.context.users[chat_id] = user
+            self.context.db.save_user(user)
         finally:
             await update.message.reply_text(emess, parse_mode="Markdown")

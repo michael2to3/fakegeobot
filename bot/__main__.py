@@ -23,7 +23,7 @@ def get_root_path():
 
 def generate_bot(config: Config):
     db = DatabaseHandler(config.api, config.db_uri)
-    return Bot(config.api, config.bot_token, db)
+    return Bot(config.api, config.bot_token, db, config)
 
 
 def start_bot(config: Config):

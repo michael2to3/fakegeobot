@@ -10,17 +10,21 @@ class Send(Command):
         chat_id = update.message.chat_id
         emess = "Well done"
         try:
-            user = self.bot.users[chat_id]
+            user = self.context.users[chat_id]
 
             if user.location is None:
-                await update.message.reply_text("Need change location")
+                await update.message.reply_text(
+                    self.text_helper.usertext("need_location")
+                )
                 return
             if user.recipient is None:
-                await update.message.reply_text("Need change recipient")
+                await update.message.reply_text(
+                    self.text_helper.usertext("need_recipient")
+                )
                 return
 
             action = Fakelocation(
-                self.bot.api, user.session, user.location, user.recipient
+                self.context.api, user.session, user.location, user.recipient
             )
             await action.execute()
         except AuthKeyUnregisteredError as e:

@@ -2,11 +2,13 @@ import logging
 import traceback
 from sqlite3 import OperationalError
 from typing import Dict
-
+from ..text import TextHelper
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
+from .botcontext import BotContext
+from .._config import Config
 
-from ._commands import (
+from .._commands import (
     Auth,
     Code,
     Delete,
@@ -20,10 +22,11 @@ from ._commands import (
     Schedule,
     Send,
     Start,
+    Language,
 )
-from ._db import DatabaseHandler
+from .._db import DatabaseHandler
 from .abstract_bot import AbstractBot
-from .model import ApiApp, User
+from ..model import ApiApp, User
 
 
 class Bot(AbstractBot):
@@ -33,13 +36,14 @@ class Bot(AbstractBot):
     _users: Dict[int, User]
     _db: DatabaseHandler
 
-    def __init__(self, api: ApiApp, token: str, db: DatabaseHandler):
+    def __init__(self, api: ApiApp, token: str, db: DatabaseHandler, config: Config):
         self.logger = logging.getLogger(__name__)
         self._app = Application.builder().token(token).build()
         self._api = api
         self._db = db
         users = list(db.load_all_users())
         self._users = {user.session.chat_id: user for user in users}
+        self._context = BotContext(api, self._users, self._db, config)
 
     async def _handle_command(
         self, command: str, update: Update, context: ContextTypes.DEFAULT_TYPE
@@ -50,20 +54,22 @@ class Bot(AbstractBot):
 
         command = update.message.text.split(" ")[0].lstrip("/")
 
+        text_helper = TextHelper(update, self.users)
         handlers = {
-            "start": Start(self),
-            "help": Help(self),
-            "auth": Auth(self),
-            "code": Code(self),
-            "schedule": Schedule(self),
-            "send": Send(self),
-            "disable": Disable(self),
-            "enable": Enable(self),
-            "delete": Delete(self),
-            "location": Location(self),
-            "recipient": Recipient(self),
-            "reauth": Reauth(self),
-            "info": Info(self),
+            "start": Start(self._context, text_helper),
+            "help": Help(self._context, text_helper),
+            "auth": Auth(self._context, text_helper),
+            "code": Code(self._context, text_helper),
+            "schedule": Schedule(self._context, text_helper),
+            "send": Send(self._context, text_helper),
+            "disable": Disable(self._context, text_helper),
+            "enable": Enable(self._context, text_helper),
+            "delete": Delete(self._context, text_helper),
+            "location": Location(self._context, text_helper),
+            "recipient": Recipient(self._context, text_helper),
+            "reauth": Reauth(self._context, text_helper),
+            "info": Info(self._context, text_helper),
+            "language": Language(self._context, text_helper),
         }
 
         handler = handlers.get(command)
@@ -72,32 +78,30 @@ class Bot(AbstractBot):
                 await handler.handle(update, context)
             except ConnectionError as e:
                 self.logger.error(f"ConnectionError: {e}")
-                await update.message.reply_text(f"ConnectionError: {e}")
+
+                await update.message.reply_text(
+                    text_helper.usertext("connection_error")
+                )
             except ValueError as e:
                 self.logger.error(f"ValueError: {e}")
-                await update.message.reply_text(f"ValueError: {e}")
+                await update.message.reply_text(text_helper.usertext("value_error"))
             except OperationalError as e:
                 error_traceback = traceback.format_exc()
                 self.logger.error(
                     f"Error while handling the command: {command}, {e}\n{error_traceback}"
                 )
-                await update.message.reply_text(
-                    "Oops, the database is locked!"
-                    "This might be due to live location messages blocking the database in the Telegram API."
-                    "Please try deleting your message with live location and then send your command again."
-                    "Or wait a few minutes and try again."
-                )
+                await update.message.reply_text(text_helper.usertext("database_error"))
             except Exception as e:
                 error_traceback = traceback.format_exc()
                 self.logger.error(
                     f"Error while handling the command: {command}, {e}\n{error_traceback}"
                 )
-                await update.message.reply_text(
-                    f"Oops! An error occurred while handling the command: {command}."
-                )
+                await update.message.reply_text(text_helper.usertext("unknown_error"))
         else:
-            self.logger.warn(f"Unknown command: {command}")
-            await update.message.reply_text(f"Unknown command: {command}")
+            self.logger.warning(f"Unknown command: {command}")
+            await update.message.reply_text(
+                text_helper.usertext("unknown_command").format(command)
+            )
 
     def run(self) -> None:
         app = self._app
@@ -115,6 +119,7 @@ class Bot(AbstractBot):
             "recipient",
             "reauth",
             "info",
+            "language",
         ]
 
         for command in commands:

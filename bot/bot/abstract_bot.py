@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from ._db import DatabaseHandler
-from .model import ApiApp, User
+from .._db import DatabaseHandler
+from ..model import ApiApp, User
 
 
 class AbstractBot(ABC):
