@@ -2,7 +2,8 @@ version: '3'
 
 services:
   app:
-    build: .
+    # build: .
+    image: dockeronfullpc/fakegeobot:latest
     restart: always
     env_file:
       - .env
