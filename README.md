@@ -27,7 +27,7 @@ This bot was created to help users bypass location checks in various application
 2. Run `pip install -r requirements.txt` to install required packages
 3. Create a bot in Telegram and get your API key
 4. Set your API key as an environment variable with the name `BOT_TOKEN`, `API_ID`, `API_HASH` and `SQLITE_PATH`
-5. Run the bot using `python ./fakegeo/main.py`
+5. Run the bot using `python .`
 
 ## Docker
 - Build the container using the command `docker build -t your_image_name .`
