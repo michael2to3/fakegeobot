@@ -43,7 +43,7 @@ class Code(Command):
                 config, self.context.api, user.session, user.location, user.recipient
             ).execute,
             cron_expression=user.cron.expression if user.cron is not None else None,
-            callback_timeout=user.cron.timeout
-            if user.cron is not None
-            else config.cron_timeout,
+            callback_timeout=(
+                user.cron.timeout if user.cron is not None else config.cron_timeout
+            ),
         )

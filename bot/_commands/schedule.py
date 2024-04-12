@@ -40,9 +40,11 @@ class Schedule(Command):
                     self.context.api, user.session, user.location, user.recipient
                 ).execute,
                 cron_expression=schedule,
-                callback_timeout=user.cron.timeout
-                if user.cron is not None
-                else self.context.config.cron_timeout,
+                callback_timeout=(
+                    user.cron.timeout
+                    if user.cron is not None
+                    else self.context.config.cron_timeout
+                ),
             )
 
             user.cron.start()
